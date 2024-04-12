@@ -1,0 +1,13 @@
+.center-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Optionally, you can adjust the height based on your design */
+}
+
+.white-box {
+    
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Adjust shadow properties as needed */
+    padding: 20px; /* Adjust padding as needed */
+    border-radius: 8px; /* Adjust border radius as needed */
+}
