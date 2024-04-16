@@ -212,9 +212,14 @@ const VerticalNav = memo(() => {
             <span>Appointments</span>
           </li>
 
-          <SidebarMenu isTag="true" pathname="/home/calendar" title="Scheduled Appointments">
+          <SidebarMenu isTag="true" pathname="/home/all-doctors" title="Scheduled Appointments">
             <i className="ri-calendar-event-fill"></i>
           </SidebarMenu>
+
+          <SidebarMenu isTag="true" pathname="/home/add-doctors" title="Add User">
+            <i className="ri-calendar-event-fill"></i>
+          </SidebarMenu>
+
           {/* Chat */}
           <SidebarMenu isTag="true" pathname="/home/chat" title="Chat">
             <i className="ri-message-fill"></i>
