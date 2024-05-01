@@ -46,6 +46,8 @@ package com.hadproject.healthcareapp.appointment;
 //
 //}
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -53,5 +55,14 @@ import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer> {
     Optional<List<Appointment>> findByDate(LocalDate date);
+
+    @Query("SELECT a FROM Appointment a WHERE a.expertId=:expertId")
+    List<Appointment> findByExpertId(@Param("expertId") Integer expertId);
+
+    @Query("SELECT a FROM Appointment a WHERE  a.patientId=:patientId")
+    List<Appointment> findByPatientId(@Param("patientId") Integer patientId);
+
+
+
 }
 
