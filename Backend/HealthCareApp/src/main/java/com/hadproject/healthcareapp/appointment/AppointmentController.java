@@ -49,6 +49,8 @@ public class AppointmentController {
     
 
 
+
+    //Expert Controller
     @GetMapping("/RoleBasedAppointment/{userId}")
     public ResponseEntity<List<RoleBasedAppointmentResponse>> roleBasedAppointment(@PathVariable Integer userId) {
         Optional<List<RoleBasedAppointmentResponse>> appointmentOptional = appointmentService.viewAppointmentDetails(userId);
@@ -56,6 +58,7 @@ public class AppointmentController {
         return appointmentOptional.map(roleBasedAppointmentResponses -> ResponseEntity.ok().body(roleBasedAppointmentResponses)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    //Patient Controller
     @GetMapping("/RoleBasedAppointment2/{userId}")
     public ResponseEntity<List<RoleBasedAppointmentResponse>> roleBasedAppointment2(@PathVariable Integer userId) {
         Optional<List<RoleBasedAppointmentResponse>> appointmentOptional = appointmentService.viewAppointmentDetails2(userId);
@@ -63,6 +66,16 @@ public class AppointmentController {
         return appointmentOptional.map(roleBasedAppointmentResponses -> ResponseEntity.ok().body(roleBasedAppointmentResponses)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/genderDistributionByExpert/{userId}")
+    public List<GenderDistributionResponse> getGenderDistribution(@PathVariable Integer userId){
+        List<GenderDistributionResponse> response = appointmentService.getGenderDistributionForExpert(userId);
+        return response;
+    }
+
+    @GetMapping("/appointmentCountByExpert/{userId}")
+    public List<Integer> getAppointmentCount(@PathVariable Integer userId){
+        return appointmentService.getAppointmentCountsByExpert(userId);
+    }
 //    @GetMapping("/RoleBasedAppointment")
 //    public ResponseEntity<List<RoleBasedAppointmentResponse>> roleBasedAppointment(HttpServletRequest request) {
 //        String headerToken = request.getHeader("Authorization");

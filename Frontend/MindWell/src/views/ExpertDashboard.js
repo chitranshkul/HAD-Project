@@ -1,9 +1,10 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import { Col, Dropdown, Row, Table, Button } from "react-bootstrap";
 import ReactECharts from "echarts-for-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // Chart
 import Chart from "react-apexcharts";
+import axios from "axios";
 
 // Img
 import user from "../assets/images/user/04.jpg"
@@ -39,7 +40,7 @@ import axiosInstance from "../axiosInstance";
 
 const ExpertDashboard = () => {
 
-    const chart6 = {
+    const [chart6, setChart6] = useState({
         tooltip: {
             trigger: "item",
         },
@@ -74,10 +75,12 @@ const ExpertDashboard = () => {
                 ],
             },
         ],
-    };
+
+    })
 
 
-    const chart3 = {
+
+    const [chart3, setChart3] = useState({
         options: {
             chart: {
                 height: 150,
@@ -109,7 +112,7 @@ const ExpertDashboard = () => {
                 size: 4,
             },
             yaxis: {
-                max: 100,
+                max: 10,
             },
             fill: {
                 type: "gradient",
@@ -130,41 +133,67 @@ const ExpertDashboard = () => {
                 data: [50, 60, 45, 90, 44, 50, 98, 75, 50],
             },
         ],
-    }
-    const chart4 = {
-        options: {
-            chart: {
-                height: 290,
-                type: 'radialBar',
-            },
-            plotOptions: {
-                radialBar: {
-                    dataLabels: {
-                        name: {
-                            fontSize: '22px',
-                        },
-                        value: {
-                            fontSize: '16px',
-                        },
-                        total: {
-                            show: true,
-                            label: 'Total',
-                            formatter: function () {
-                                // By default this function returns the average of all series. The below is just an example to show the use of custom formatter function
-                                return 249
-                            }
-                        }
-                    },
-                    track: {
-                        background: ['#089bab', '#FC9F5B', '#75DDDD', '#ffb57e']
-                    }
-                }
-            },
-        },
-        series: [44, 55, 67, 83],
-        labels: ['Apples', 'Oranges', 'Bananas', 'Berries'],
-        colors: ['#089bab', '#FC9F5B', '#75DDDD', '#ffb57e'],
-    }
+
+    })
+
+    const [appointments, setAppointments] = useState([
+        {
+            Name: "Chitransh Kulshrestha",
+            Date: "2024-04-03",
+            Time: "01:00:00",
+            username: "chituh@iiitb.ac.in",
+            gender: "Male"
+        }
+    ]);
+
+    useEffect(() => {
+        console.log("Fetching Appointments");
+        axios.get('/api/v1/appointment/RoleBasedAppointment/' + localStorage.getItem('id'))
+            .then(response => {
+                console.log(response.data)
+                setAppointments(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching questions:', error);
+            });
+
+        console.log("Gender Distribution");
+        axios.get('/api/v1/appointment/genderDistributionByExpert/' + localStorage.getItem('id'))
+            .then(response => {
+                console.log(response.data)
+                const updatedChartData = {
+                    ...chart6,
+                    series: [
+                      {
+                        ...chart6.series[0],
+                        data: response.data, // Update data with API response
+                      },
+                    ],
+                  };
+                  setChart6(updatedChartData);
+            })
+            .catch(error => {
+                console.error('Error fetching questions:', error);
+            });
+
+            console.log("Appointent Count");
+            axios.get('/api/v1/appointment/appointmentCountByExpert/4')
+            .then(response => {
+                console.log(response.data)
+                setChart3(prevState => ({
+                    ...prevState,
+                    series: [{
+                        ...prevState.series[0], // Keep other properties of series intact
+                        data: response.data, // Update data with new data array from API
+                    }],
+                }));
+            })
+            .catch(error => {
+                console.error('Error fetching questions:', error);
+            });
+
+
+    }, []);
 
     return (
         <Fragment>
@@ -218,99 +247,30 @@ const ExpertDashboard = () => {
                                                 <tr>
                                                     <th scope="col">Patient</th>
                                                     <th scope="col">Patient Name </th>
+                                                    <th scope="col">Gender </th>
                                                     <th scope="col">Date Of Appointment</th>
                                                     <th scope="col">Time Of Appointment</th>
-                                                    <th scope="col"> Report</th>
-                                                    <th scope="col">Diseases</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <img
-                                                            className="rounded-circle img-fluid avatar-40"
-                                                            src={user7}
-                                                            alt="profile"
-                                                        />
-                                                    </td>
-                                                    <td>Petey Cruiser</td>
-                                                    <td>12-02-2020</td>
-                                                    <td>12:00 PM</td>
+                                                {appointments.map((appointment, index) => (
+                                                    <tr>
+                                                        <td className="text-center">
+                                                            <img
+                                                                className="rounded-circle img-fluid avatar-40"
+                                                                src={user7}
+                                                                alt="profile"
+                                                            />
+                                                        </td>
+                                                        <td>{appointment.Name}</td>
+                                                        <td>{appointment.gender}</td>
+                                                        <td>{appointment.Date}</td>
+                                                        <td>{appointment.Time}</td>
 
-                                                    <td>
-                                                        <i className="ri-file-pdf-line font-size-16 text-danger"></i>
-                                                    </td>
-                                                    <td>Fracture</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <img
-                                                            className="rounded-circle img-fluid avatar-40"
-                                                            src={user7}
-                                                            alt="profile"
-                                                        />
-                                                    </td>
-                                                    <td>Petey Cruiser</td>
-                                                    <td>12-02-2020</td>
-                                                    <td>12:00 PM</td>
 
-                                                    <td>
-                                                        <i className="ri-file-pdf-line font-size-16 text-danger"></i>
-                                                    </td>
-                                                    <td>Fracture</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <img
-                                                            className="rounded-circle img-fluid avatar-40"
-                                                            src={user7}
-                                                            alt="profile"
-                                                        />
-                                                    </td>
-                                                    <td>Petey Cruiser</td>
-                                                    <td>12-02-2020</td>
-                                                    <td>12:00 PM</td>
+                                                    </tr>
+                                                ))}
 
-                                                    <td>
-                                                        <i className="ri-file-pdf-line font-size-16 text-danger"></i>
-                                                    </td>
-                                                    <td>Fracture</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <img
-                                                            className="rounded-circle img-fluid avatar-40"
-                                                            src={user7}
-                                                            alt="profile"
-                                                        />
-                                                    </td>
-                                                    <td>Petey Cruiser</td>
-                                                    <td>12-02-2020</td>
-                                                    <td>12:00 PM</td>
-
-                                                    <td>
-                                                        <i className="ri-file-pdf-line font-size-16 text-danger"></i>
-                                                    </td>
-                                                    <td>Fracture</td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <img
-                                                            className="rounded-circle img-fluid avatar-40"
-                                                            src={user7}
-                                                            alt="profile"
-                                                        />
-                                                    </td>
-                                                    <td>Petey Cruiser</td>
-                                                    <td>12-02-2020</td>
-                                                    <td>12:00 PM</td>
-
-                                                    <td>
-                                                        <i className="ri-file-pdf-line font-size-16 text-danger"></i>
-                                                    </td>
-                                                    <td>Fracture</td>
-                                                </tr>
                                             </tbody>
                                         </Table>
                                     </div>
@@ -327,56 +287,18 @@ const ExpertDashboard = () => {
                                     </div>
                                     <div className="iq-card-body">
                                         <ul className="report-lists m-0 p-0">
-                                            <li className="d-flex mb-4 align-items-center">
-                                                <div className="media-support-info">
-                                                    <h6>Chitransh Kulshrestha</h6>
-                                                    <Link to="#">Male</Link>
-                                                </div>
+                                            {appointments.map((appointment, index) => (
+                                                <li className="d-flex mb-4 align-items-center">
+                                                    <div className="media-support-info">
+                                                        <h6>{appointment.Name}</h6>
+                                                        <Link to="#">{appointment.gender}</Link>
+                                                    </div>
 
-                                                <Button variant="outline-warning" className="me-1 mb-3 ">
-                                                    <i className="ri-message-fill"></i>{"       "}Chat
-                                                </Button>
-                                            </li>
-                                            <li className="d-flex mb-4 align-items-center">
-                                                <div className="media-support-info">
-                                                    <h6>Chitransh Kulshrestha</h6>
-                                                    <Link to="#">Male</Link>
-                                                </div>
-
-                                                <Button variant="outline-warning" className="me-1 mb-3 ">
-                                                    <i className="ri-message-fill"></i>{"       "}Chat
-                                                </Button>
-                                            </li>
-                                            <li className="d-flex mb-4 align-items-center">
-                                                <div className="media-support-info">
-                                                    <h6>Chitransh Kulshrestha</h6>
-                                                    <Link to="#">Male</Link>
-                                                </div>
-
-                                                <Button variant="outline-warning" className="me-1 mb-3 ">
-                                                    <i className="ri-message-fill"></i>{"       "}Chat
-                                                </Button>
-                                            </li>
-                                            <li className="d-flex mb-4 align-items-center">
-                                                <div className="media-support-info">
-                                                    <h6>Chitransh Kulshrestha</h6>
-                                                    <Link to="#">Male</Link>
-                                                </div>
-
-                                                <Button variant="outline-warning" className="me-1 mb-3 ">
-                                                    <i className="ri-message-fill"></i>{"       "}Chat
-                                                </Button>
-                                            </li>
-                                            <li className="d-flex mb-4 align-items-center">
-                                                <div className="media-support-info">
-                                                    <h6>Chitransh Kulshrestha</h6>
-                                                    <Link to="#">Male</Link>
-                                                </div>
-
-                                                <Button variant="outline-warning" className="me-1 mb-3 ">
-                                                    <i className="ri-message-fill"></i>{"       "}Chat
-                                                </Button>
-                                            </li>
+                                                    <Button variant="outline-warning" className="me-1 mb-3 ">
+                                                        <i className="ri-message-fill"></i>{"       "}Chat
+                                                    </Button>
+                                                </li>
+                                            ))}
                                         </ul>
                                     </div>
                                 </div>

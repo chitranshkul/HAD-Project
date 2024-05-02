@@ -43,5 +43,6 @@ public class Appointment {
 
     private int expertId;
 
-    private boolean status;
+    @Column(nullable = false)
+    private boolean status = false;
 }
