@@ -42,4 +42,7 @@ public class Appointment {
     private int patientId;
 
     private int expertId;
+
+    @Column(nullable = false)
+    private int status  = 0;
 }

@@ -23,19 +23,19 @@ public class SimpleCORSFilter implements Filter {
 
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Max-Age", "1800");
-        response.setHeader("Access-Control-Allow-Headers", "content-type");
-        response.setHeader("Access-Control-Allow-Methods","PUT, POST, GET, DELETE, PATCH, OPTIONS");
-
-
-
-//        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+//        response.setHeader("Access-Control-Allow-Origin", "*");
 //        response.setHeader("Access-Control-Allow-Credentials", "true");
-//        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-//        response.setHeader("Access-Control-Max-Age", "3600");
-//        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me, jwt_token");
+//        response.setHeader("Access-Control-Max-Age", "1800");
+//        response.setHeader("Access-Control-Allow-Headers", "content-type");
+//        response.setHeader("Access-Control-Allow-Methods","PUT, POST, GET, DELETE, PATCH, OPTIONS");
+//
+
+
+        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me, jwt_token");
 
         chain.doFilter(req, res);
 

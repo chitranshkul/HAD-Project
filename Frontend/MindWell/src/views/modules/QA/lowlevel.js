@@ -7,6 +7,9 @@ import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../axiosInstance';
 
+import axios from 'axios';
+
+
 const LowLevel = () => {
   // Array to store answers and their like counts along with the user who answered
   let { qid } = useParams();
@@ -35,21 +38,13 @@ const LowLevel = () => {
     upvote: 0
   }]);
 
-  const[ flag,setFlag] = useState({
-    id:""
+  const [flag, setFlag] = useState({
+    id: ""
   });
 
 
   useEffect(() => {
 
-    const checkEligiblity = async () => {
-      const accessToken = localStorage.getItem('access_token');
-      const userid = localStorage.getItem('id');
-
-      if (accessToken === null) {
-        navigate('/sign-in');
-      }
-    }
 
     const fetchQuestion = async () => {
       const accessToken = localStorage.getItem('access_token');
@@ -61,11 +56,20 @@ const LowLevel = () => {
           // "Access-Control-Allow-Origin": "*",
           Authorization: `Bearer ${accessToken}`,
         };
+        axios.get('/api/v1/qaresponse/getQuestion/' + qid, { headers: headers })
+          .then(response => {
+            console.log("Admins: ", response.data);
+            setQuestion(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching responses:', error);
+          });
 
-        axiosInstance.get(`/qaresponse/getQuestion/${qid}`, { headers: headers }).then((response) => {
-          console.log("Admins: ", response.data);
-          setQuestion(response.data);
-        });
+          
+        // axiosInstance.get(`/qaresponse/getQuestion/${qid}`, { headers: headers }).then((response) => {
+        //   console.log("Admins: ", response.data);
+        //   setQuestion(response.data);
+        // });
 
       }
       catch (error) {
@@ -80,21 +84,30 @@ const LowLevel = () => {
 
         const headers = {
           "Content-Type": "application/json",
-          // "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": "*",
           Authorization: `Bearer ${accessToken}`,
         };
 
-        axiosInstance.get(`/qaresponse/responses/${qid}`, { headers: headers }).then((response) => {
-          console.log("Admins: ", response.data);
-          setAnswers(response.data);
-        });
+
+        axios.get('/api/v1/qaresponse/responses/' + qid, { headers: headers })
+          .then(response => {
+            console.log("Admins: ", response.data);
+            setAnswers(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching responses:', error);
+          });
+
+        // axiosInstance.get(`/qaresponse/responses/${qid}`, { headers: headers }).then((response) => {
+        //   console.log("Admins: ", response.data);
+        //   setAnswers(response.data);
+        // });
 
       }
       catch (error) {
         console.error('Error fetching data:', error);
       }
     }
-    checkEligiblity();
     fetchQuestion();
     fetchAnswers();
   }, [navigate]);
@@ -106,7 +119,7 @@ const LowLevel = () => {
     updatedAnswers[index].likes += 1;
     setAnswers(updatedAnswers);
   };
-  
+
 
   const handleOnChangeAddAnswer = (event) => {
     event.preventDefault();
@@ -117,24 +130,36 @@ const LowLevel = () => {
     });
   }
 
-  const handleAddQuestionSubmit = (event) => {
+  const handleAddQuestionSubmit = async (event) => {
     event.preventDefault();
     const accessToken = localStorage.getItem('access_token');
 
     try {
+      const response = await axios({
+        method: 'post',
+        url: `/api/v1/qaresponse/postresponse`,
+        data: postAnswer,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
       const headers = {
         "Content-Type": "application/json",
-        // "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": "*",
         Authorization: `Bearer ${accessToken}`,
       };
 
-      axiosInstance.post('/qaresponse/postresponse', postAnswer, { headers: headers }).then((response) => {
-        console.log("Admins: ", response.data);
-        axiosInstance.get(`/qaresponse/responses/${qid}`, { headers: headers }).then((response) => {
+      axios.get('/api/v1/qaresponse/responses/' + qid, { headers: headers })
+        .then(response => {
           console.log("Admins: ", response.data);
           setAnswers(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching responses:', error);
         });
-      });
 
     }
     catch (error) {
@@ -146,45 +171,61 @@ const LowLevel = () => {
     name: "John Doe",
     profilePic: "https://via.placeholder.com/150", // Replace with actual profile picture URL
   };
-  
-  const addToFlagResponses = (event) => {
+
+  const addToFlagResponses = async(event) => {
     event.preventDefault();
 
     const accessToken = localStorage.getItem('access_token');
-    setFlag({id:event.target.id});
+    setFlag({ id: event.target.id });
     console.log("Flagged Response: ", event.target.id);
-      try{
-        const headers = {
-          "Content-Type": "application/json",
-          // "Access-Control-Allow-Origin": "*",
-          Authorization: `Bearer ${accessToken}`,
-        };
-        console.log("Flag: ",flag)
-        axiosInstance.post(`/qaresponse/flagresponse/`, flag,{ headers: headers }).then((response) => {
-          console.log("Admins: ", response.data);
-        });
-      }
-      catch (error) {
-        console.error('Error fetching data:', error);
-      }
-  }
-
-  const addToUpvotes = (event)=>{
-    event.preventDefault();
-    
-    const accessToken = localStorage.getItem('access_token');
-    console.log("Upvoted Response: ", event.target.id);
-    try{
+    try {
       const headers = {
         "Content-Type": "application/json",
         // "Access-Control-Allow-Origin": "*",
         Authorization: `Bearer ${accessToken}`,
       };
+      console.log("Flag: ", flag)
+
+      const response = await axios({
+        method: 'post',
+        url: `/api/v1/qaresponse/flagresponse`,
+        data: flag,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+    }
+    catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
+
+  const addToUpvotes = async(event) => {
+    event.preventDefault();
+
+    const accessToken = localStorage.getItem('access_token');
+    console.log("Upvoted Response: ", event.target.id);
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization: `Bearer ${accessToken}`,
+      };
       const upvoteData = {
         id: event.target.id
       }
-      axiosInstance.post(`/qaresponse/upvote/`, upvoteData,{ headers: headers }).then((response) => {
-        console.log("Admins: ", response.data);
+
+      const response = await axios({
+        method: 'post',
+        url: `/api/v1/qaresponse/upvote`,
+        data: upvoteData,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
     }
     catch (error) {
@@ -261,12 +302,12 @@ const LowLevel = () => {
               {/* Like and Dislike Buttons */}
 
               <div className="d-flex justify-content-end px-3 align-items-center">
-                <Button variant="danger" className="me-1 mb-3" onClick={addToFlagResponses} id = {answer.answer_id}>
+                <Button variant="danger" className="me-1 mb-3" onClick={addToFlagResponses} id={answer.answer_id}>
                   <FontAwesomeIcon icon={faFlag} className="me-1" />
                   Flag Answer
                 </Button>
-                <Button variant="primary" className="me-1 mb-3"  onClick={addToUpvotes} id = {answer.answer_id}>
-                  <FontAwesomeIcon icon={faThumbsUp} className="me-1"   />
+                <Button variant="primary" className="me-1 mb-3" onClick={addToUpvotes} id={answer.answer_id}>
+                  <FontAwesomeIcon icon={faThumbsUp} className="me-1" />
                   Upvote
                 </Button>
 

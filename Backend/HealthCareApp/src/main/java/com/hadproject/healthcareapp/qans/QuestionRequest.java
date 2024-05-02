@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuestionRequest {
+
     private int uid;
     private String question_text;
     private String tags;

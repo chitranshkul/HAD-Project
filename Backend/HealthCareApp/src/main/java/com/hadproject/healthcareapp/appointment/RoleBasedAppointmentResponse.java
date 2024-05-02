@@ -22,4 +22,13 @@ public class RoleBasedAppointmentResponse {
 
     @JsonProperty("Time")
     private LocalTime Time;
+
+    @JsonProperty("username")
+    private String username;
+
+    @JsonProperty("gender")
+    private String gender;
+
+    @JsonProperty("appointid")
+    private int appointmentID;
 }

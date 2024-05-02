@@ -1,6 +1,11 @@
 package com.hadproject.healthcareapp.auth;
 
+import com.hadproject.healthcareapp.Experience.DTO.GetExperienceResponse;
+import com.hadproject.healthcareapp.Experience.ExperienceService;
 import com.hadproject.healthcareapp.config.JwtService;
+import com.hadproject.healthcareapp.education.DTO.ResponseSendEducationDetails;
+import com.hadproject.healthcareapp.education.EducationRepository;
+import com.hadproject.healthcareapp.education.EducationService;
 import com.hadproject.healthcareapp.token.Token;
 import com.hadproject.healthcareapp.token.TokenRepository;
 import com.hadproject.healthcareapp.token.TokenType;
@@ -19,6 +24,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,6 +36,8 @@ public class AuthenticationService {
   private final UserDetailRepository userDetailRepository;
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
+  private final EducationService educationService;
+  private final ExperienceService experienceService;
 
   public AuthenticationResponse register(RegisterRequest request) {
     var user = User.builder()
@@ -168,7 +176,45 @@ public class AuthenticationService {
 
     return  "Reset Successfully";
   }
+  public UserProfileResponse getProfile(String username){
+    UserProfileResponse userProfile = new UserProfileResponse();
+    Optional<User> user = repository.findByEmail(username);
+    if(user.isPresent()){
+      System.out.println("**************** GOt User in   Profile ***********************");
+      Optional<UserDetail> userDetail = userDetailRepository.findByUid(user.get());
+      if(userDetail.isPresent()){
+        System.out.println("**************** GOt UserDetails in   Profile ***********************");
+        List<ResponseSendEducationDetails> educationDetailsList = educationService.getEducationalDetails(username);
+        List<GetExperienceResponse> experienceDetails = experienceService.getExperiences(username);
+        System.out.println("**************************************  The fname I got is "+userDetail.get().getLname());
+        userProfile = UserProfileResponse
+                .builder()
+                .fname(userDetail.get().getFname())
+                .mname(userDetail.get().getMname())
+                .lname(userDetail.get().getLname())
+                .gender(userDetail.get().getGender())
+                .hno(userDetail.get().getHno())
+                .Street1(userDetail.get().getStreet1())
+                .Street2(userDetail.get().getStreet2())
+                .Pin_Code(userDetail.get().getPin_Code())
+                .City(userDetail.get().getCity())
+                .State(userDetail.get().getState())
+                .Country(userDetail.get().getCountry())
+                .District(userDetail.get().getDistrict())
+                .Mobile(userDetail.get().getMobile())
+                .dob(userDetail.get().getDob())
+                .dor(userDetail.get().getDor())
+                .educationDetails(educationDetailsList)
+                .expertienceDetails(experienceDetails)
+                .build();
+      }
+    }
+
+    return userProfile;
+  }
 }
+
+
 
 
 
