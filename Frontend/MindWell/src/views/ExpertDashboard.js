@@ -142,7 +142,19 @@ const ExpertDashboard = () => {
             Date: "2024-04-03",
             Time: "01:00:00",
             username: "chituh@iiitb.ac.in",
-            gender: "Male"
+            gender: "Male",
+            appointid: "1"
+        }
+    ]);
+
+    const [Pendingappointments, setPendingAppointments] = useState([
+        {
+            Name: "Chitransh Kulshrestha",
+            Date: "2024-04-03",
+            Time: "01:00:00",
+            username: "chituh@iiitb.ac.in",
+            gender: "Male",
+            appointid: "1"
         }
     ]);
 
@@ -177,7 +189,7 @@ const ExpertDashboard = () => {
             });
 
             console.log("Appointent Count");
-            axios.get('/api/v1/appointment/appointmentCountByExpert/4')
+        axios.get('/api/v1/appointment/appointmentCountByExpert/4')
             .then(response => {
                 console.log(response.data)
                 setChart3(prevState => ({
@@ -192,8 +204,35 @@ const ExpertDashboard = () => {
                 console.error('Error fetching questions:', error);
             });
 
+        axios.get('/api/v1/appointment/getPendingAppointmets/' + localStorage.getItem('id'))
+            .then(response => {
+                console.log("Got Pending Appointments",response.data)
+                setPendingAppointments(response.data);
+            }).catch(error => {
+                console.error('Error fetching questions:', error);
+            });
 
     }, []);
+
+    const handleAcceptAppointment = async(event,appointment) =>{
+        event.preventDefault();
+        console.log("Accepting Appointment",appointment);
+        const response = await axios({
+            method: 'post',
+            url: `/api/v1/appointment/AcceptOrReject-request/`+appointment.appointid+`/Accept`,
+          });
+        console.log(response.data);
+    }
+
+    const handleRejectAppointment = async(event,appointment) =>{
+        event.preventDefault();
+        console.log("Rejecting Appointment",appointment);
+        const response = await axios({
+            method: 'post',
+            url: `/api/v1/appointment/AcceptOrReject-request/`+appointment.appointid+`/Reject`,
+          });
+        console.log(response.data);
+    }
 
     return (
         <Fragment>
@@ -313,91 +352,31 @@ const ExpertDashboard = () => {
                                 </div>
                                 <div className="iq-card-body">
                                     <ul className="iq-timeline">
+                                        {Pendingappointments.map((appointment, index) => (
                                         <li>
                                             <div className="timeline-dots-fill"></div>
                                             <h5 className="float-start mb-2 text-dark">
-                                                {localStorage.getItem('username')}
+                                                {appointment.Name}
                                             </h5>
 
 
                                             <div className="d-inline-block w-100">
                                                 <p>
-                                                    Description of the problem faced by the user
+                                                    Date : {appointment.Date+" "+appointment.Time}
+                                                    <br></br>
+                                                    Gender: {appointment.gender}
                                                 </p>
                                             </div>
                                             <div className="d-flex justify-content-between justify-content-end">
-                                                <Button variant="primary" className="me-1 mb-3 ">
-                                                    <i class="fa fa-check"></i>accept
-                                                </Button>
-                                                <Button variant="danger" className="me-1 mb-3 ">
-                                                    <i class="fa fa-trash"></i>Reject
-                                                </Button>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="timeline-dots-fill"></div>
-                                            <h5 className="float-start mb-2 text-dark">
-                                                {localStorage.getItem('username')}
-                                            </h5>
-
-
-                                            <div className="d-inline-block w-100">
-                                                <p>
-                                                    Description of the problem faced by the user
-                                                </p>
-                                            </div>
-                                            <div className="d-flex justify-content-between justify-content-end">
-                                                <Button variant="primary" className="me-1 mb-3 ">
-                                                    <i class="fa fa-check"></i>accept
-                                                </Button>
-                                                <Button variant="danger" className="me-1 mb-3 ">
-                                                    <i class="fa fa-trash"></i>Reject
-                                                </Button>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="timeline-dots-fill"></div>
-                                            <h5 className="float-start mb-2 text-dark">
-                                                {localStorage.getItem('username')}
-                                            </h5>
-
-
-                                            <div className="d-inline-block w-100">
-                                                <p>
-                                                    Description of the problem faced by the user
-                                                </p>
-                                            </div>
-                                            <div className="d-flex justify-content-between justify-content-end">
-                                                <Button variant="primary" className="me-1 mb-3 ">
-                                                    <i class="fa fa-check"></i>accept
-                                                </Button>
-                                                <Button variant="danger" className="me-1 mb-3 ">
-                                                    <i class="fa fa-trash"></i>Reject
-                                                </Button>
-                                            </div>
-                                        </li>
-
-                                        <li>
-                                            <div className="timeline-dots-fill"></div>
-                                            <h5 className="float-start mb-2 text-dark">
-                                                {localStorage.getItem('username')}
-                                            </h5>
-
-
-                                            <div className="d-inline-block w-100">
-                                                <p>
-                                                    Description of the problem faced by the user
-                                                </p>
-                                            </div>
-                                            <div className="d-flex justify-content-between justify-content-end">
-                                                <Button variant="primary" className="me-1 mb-3 ">
+                                                <Button variant="primary" className="me-1 mb-3 " onClick={(event) => handleAcceptAppointment(event, appointment)}>
                                                     <i class="fa fa-check"></i>Accept
                                                 </Button>
-                                                <Button variant="danger" className="me-1 mb-3 ">
-                                                    <i class="fa fa-trash"></i>Reject
+                                                <Button variant="danger" className="me-1 mb-3 " onClick={(event) => handleRejectAppointment(event, appointment)}>
+                                                    <i class="fa fa-trash" ></i>Reject
                                                 </Button>
                                             </div>
                                         </li>
+                                        ))}
 
 
                                     </ul>

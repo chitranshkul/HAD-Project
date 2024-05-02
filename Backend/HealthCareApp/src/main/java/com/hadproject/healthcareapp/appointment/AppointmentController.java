@@ -37,6 +37,10 @@ public class AppointmentController {
     }
 
 
+    @GetMapping("/getPendingAppointmets/{expertID}")
+    public ResponseEntity<List<RoleBasedAppointmentResponse>> getPendingAppointments(@PathVariable Integer expertID){
+        return ResponseEntity.ok(appointmentService.viewPendingAppointments(expertID));
+    }
     @GetMapping("/GetAppointmentsByDate/{date}")
     public ResponseEntity<List<Appointment>> getAppointmentsByDate(@PathVariable LocalDate date) {
         Optional<List<Appointment>> appointmentDetails = appointmentService.getAppointmentsByDate(date);

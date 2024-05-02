@@ -64,7 +64,7 @@ public class AppointmentService {
         Optional<Appointment> appointmentOptional = appointmentRepository.findById(id);
         if(appointmentOptional.isPresent()){
             Appointment appointment = appointmentOptional.get();
-            appointment.setStatus(true);
+            appointment.setStatus(1);
             appointmentRepository.save(appointment);
             return "Appointment Accepted";
         }
@@ -101,29 +101,31 @@ public class AppointmentService {
             List<RoleBasedAppointmentResponse> appointmentResponses = new ArrayList<>();
 
             for (Appointment appointment : appointments) {
-                User user = new User(); // Assuming you have a constructor or builder for User
-                user.setId(appointment.getPatientId()); // Set the id of the User object
+                if(appointment.getStatus()==1) {
+                    User user = new User(); // Assuming you have a constructor or builder for User
+                    user.setId(appointment.getPatientId()); // Set the id of the User object
 
-                Optional<UserDetail> userDetailOptional = userDetailsRepository.findByUid(user);
-                if (userDetailOptional.isPresent()) {
+                    Optional<UserDetail> userDetailOptional = userDetailsRepository.findByUid(user);
+                    if (userDetailOptional.isPresent()) {
 
-                    Optional<User> Optusr  = userRepository.findById(appointment.getPatientId());
-                    if(Optusr.isPresent()) {
-                        User usr = Optusr.get();
-                        System.out.println("******************************* ");
-                        System.out.println(usr.getUsername() + "****");
-                        UserDetail userDetail = userDetailOptional.get();
-                        appointmentResponses.add(RoleBasedAppointmentResponse.builder()
-                                .Name(userDetail.getFname() + " " + userDetail.getLname())
-                                .Date(appointment.getDate())
-                                .Time(appointment.getTime())
-                                .username(usr.getUsername())
-                                .gender(userDetail.getGender())
-                                .build());
+                        Optional<User> Optusr = userRepository.findById(appointment.getPatientId());
+                        if (Optusr.isPresent()) {
+                            User usr = Optusr.get();
+                            System.out.println("******************************* ");
+                            System.out.println(usr.getUsername() + "****");
+                            UserDetail userDetail = userDetailOptional.get();
+                            appointmentResponses.add(RoleBasedAppointmentResponse.builder()
+                                    .Name(userDetail.getFname() + " " + userDetail.getLname())
+                                    .Date(appointment.getDate())
+                                    .Time(appointment.getTime())
+                                    .username(usr.getUsername())
+                                    .gender(userDetail.getGender())
+                                    .appointmentID(appointment.getId())
+                                    .build());
+                        }
+                    } else {
+                        System.err.println("UserDetail not found for PatientId: " + appointment.getPatientId());
                     }
-
-                } else {
-                    System.err.println("UserDetail not found for PatientId: " + appointment.getPatientId());
                 }
             }
 
@@ -148,7 +150,7 @@ public class AppointmentService {
                 User user = new User(); // Assuming you have a constructor or builder for User
                 user.setId(appointment.getExpertId()); // Set the id of the User object
                 System.out.println("******************************* ");
-                System.out.println(user.getUsername()+"****");
+                System.out.println(appointment.getId()+"****");
                 Optional<UserDetail> userDetailOptional = userDetailsRepository.findByUid(user);
                 if (userDetailOptional.isPresent()) {
 
@@ -161,6 +163,7 @@ public class AppointmentService {
                                 .Date(appointment.getDate())
                                 .Time(appointment.getTime())
                                 .username(usr.getUsername())
+                                .appointmentID(appointment.getId())
                                 .build());
                     }
                 } else {
@@ -177,6 +180,35 @@ public class AppointmentService {
         }
     }
 
+    public List<RoleBasedAppointmentResponse> viewPendingAppointments(Integer ExpertID){
+        List<RoleBasedAppointmentResponse> roleBasedAppointmentResponses = new ArrayList<RoleBasedAppointmentResponse>();
+        List<Appointment> appointments = appointmentRepository.findByExpertId(ExpertID);
+        for(Appointment appointment: appointments){
+            System.out.println("*******************************"+appointment.getStatus());
+            if (appointment.getStatus()==0){
+                System.out.println("I got the Pending Appointment");
+                Optional<User> optUsr = userRepository.findById(appointment.getPatientId());
+                if(optUsr.isPresent()){
+                    Optional<UserDetail> optionalUserDetail  = userDetailsRepository.findByUid(optUsr.get());
+                    if(optionalUserDetail.isPresent()){
+                        UserDetail userDetail = optionalUserDetail.get();
+                        roleBasedAppointmentResponses.add(RoleBasedAppointmentResponse
+                                .builder()
+                                .Name(userDetail.getFname() + " " + userDetail.getLname())
+                                .Date(appointment.getDate())
+                                .Time(appointment.getTime())
+                                .username(optUsr.get().getUsername())
+                                .gender(userDetail.getGender())
+                                .appointmentID(appointment.getId())
+                                .build());
+                    }
+                }
+
+
+            };
+        }
+        return roleBasedAppointmentResponses;
+    }
 
     public List<GenderDistributionResponse> getGenderDistributionForExpert(Integer expertId){
 

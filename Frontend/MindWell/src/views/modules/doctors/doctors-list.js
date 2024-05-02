@@ -22,7 +22,7 @@ const DoctorsList = () => {
       name: "",
       gender: "",
       contact_no: "",
-      uid:""
+      uid:"",
     }
   ]);
   useEffect(() => {

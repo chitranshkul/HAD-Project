@@ -28,4 +28,7 @@ public class RoleBasedAppointmentResponse {
 
     @JsonProperty("gender")
     private String gender;
+
+    @JsonProperty("appointid")
+    private int appointmentID;
 }
