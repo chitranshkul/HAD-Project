@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface UserDetailRepository extends JpaRepository<UserDetail,Integer> {
 
     Optional<UserDetail> findByUid(User uid);
+    Optional<UserDetail> findByFname(String fname);
 }

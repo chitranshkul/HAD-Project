@@ -1,8 +1,6 @@
-package com.hadproject.healthcareapp.chat;
+package com.hadproject.healthcareapp.chatting;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hadproject.healthcareapp.expert.Expert;
-import com.hadproject.healthcareapp.patient.Patient;
 import com.hadproject.healthcareapp.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,30 +8,27 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "chat")
-public class Chat {
-
+@Table(name = "chatting")
+public class Chatting {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "c_id")
-    int id;
+    @Column(name = "cid")
+    Integer id;
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "uid")
-    private Set<User> from_id;
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "fromid", referencedColumnName = "id") // Map from_id to uid in the User table
+    private User fromid;
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "uid")
-    private Set<User> to_id;
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "toid", referencedColumnName = "id") // Map to_id to uid in the User table
+    private User toid;
 
     @JsonIgnore
     @Column(nullable = false)
