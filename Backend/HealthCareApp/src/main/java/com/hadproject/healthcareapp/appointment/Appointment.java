@@ -42,4 +42,6 @@ public class Appointment {
     private int patientId;
 
     private int expertId;
+
+    private boolean status;
 }

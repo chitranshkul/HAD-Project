@@ -25,11 +25,7 @@ public class AppointmentController {
 
     @PostMapping("/send-appointment-request")
     public String sendAppointmentRequest(@RequestBody AppointmentRequest appointmentRequest) {
-        int patientId = appointmentRequest.getPatient_ID();
-        int expertId = appointmentRequest.getExpert_ID();
-        System.out.println("******************************** HII I m gramya , patientID ********************************");
-        System.out.println("Patient ID: " + patientId);
-        System.out.println("expert ID: " + expertId);
+
         return appointmentService.sendAppointmentRequest(appointmentRequest);
     }
     @PostMapping("/AcceptOrReject-request/{id}/{status}")
@@ -53,5 +49,6 @@ public class AppointmentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    
 
 }

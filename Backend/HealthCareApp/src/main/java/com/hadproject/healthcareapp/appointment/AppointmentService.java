@@ -34,9 +34,11 @@ public class AppointmentService {
     public String sendAppointmentRequest(AppointmentRequest appointmentRequest) {
         int patientId = appointmentRequest.getPatient_ID();
         int expertId = appointmentRequest.getExpert_ID();
+
         System.out.println("******************************** HII I m gramya , patientID ********************************");
         System.out.println("Patient ID: " + patientId);
         System.out.println("expert ID: " + expertId);
+
         LocalDate date = appointmentRequest.getDate();
         LocalTime time = appointmentRequest.getTime();
 

@@ -38,39 +38,30 @@ public class AdminService {
         return 0;
     }
     // New functionality to list users by role
-    public Optional<List<RoleListResponse>> getUsersByRole(Role role) {
-        Optional<List<User>> userDetails = Optional.empty();
-        List<UserDetail> userDetail = new ArrayList<UserDetail>();
+    public List<RoleListResponse> getUsersByRole(Role role) {
+        List<RoleListResponse> userRoleDetail = new ArrayList<RoleListResponse>();
+        List<User> users = new ArrayList<User>();
 
-        try {
-            userDetails = userRepository.findByRole(role);
-            if(userDetails.isPresent()){
-                List<User> userList = userDetails.get();
-                for(User user: userList){
-                    Optional<UserDetail> userd = userDetailsRepository.findByUid(user);
-                    if(userd.isPresent()){
-                        UserDetail usr = userd.get();
-                        userDetail.add(usr);
-                    }
-
+        Optional<List<User>> optUseerByRoles = userRepository.findByRole(role);
+        if(optUseerByRoles.isPresent()){
+            List<User> usersByRoles = optUseerByRoles.get();
+            for(User userByRoles:usersByRoles){
+                users.add(userByRoles);
+                Optional<UserDetail> optUserDetail = userDetailsRepository.findByUid(userByRoles);
+                if(optUserDetail.isPresent()){
+                    UserDetail userDetail = optUserDetail.get();
+                    RoleListResponse user = RoleListResponse.builder()
+                            .id(userByRoles.getId())
+                            .username(userByRoles.getUsername())
+                            .name(userDetail.getFname()+" "+userDetail.getMname()+" "+userDetail.getLname())
+                            .gender(userDetail.getGender())
+                            .build();
+                    userRoleDetail.add(user);
                 }
             }
-
-            List<RoleListResponse> roleListResponses=new ArrayList<>();
-            for(UserDetail userDetail1 :userDetail){
-                RoleListResponse response=RoleListResponse.builder().name(userDetail1.getFname())
-                        .gender(userDetail1.getGender())
-                        .contact_no(userDetail1.getMobile()).build();
-
-                roleListResponses.add(response);
-            }
-
-            return Optional.of(roleListResponses);
         }
-        catch(Exception ex) {
-            ex.printStackTrace();
-            return Optional.empty();
-        }
+
+        return userRoleDetail;
     }
 
 

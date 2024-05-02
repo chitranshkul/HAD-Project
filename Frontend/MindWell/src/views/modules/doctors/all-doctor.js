@@ -1,5 +1,6 @@
-import React, { Fragment } from "react";
-import { Col, Row, Button} from "react-bootstrap";
+import React, { Fragment, useState, useEffect } from "react";
+import { Col, Row, Button } from "react-bootstrap";
+import axios from "axios";
 
 // Images
 import user1 from "../../../assets/images/user/12.jpg";
@@ -12,21 +13,87 @@ import user7 from "../../../assets/images/user/18.jpg";
 
 // Link
 import { Link } from "react-router-dom";
+import { exp } from "@amcharts/amcharts5/.internal/core/util/Ease";
 
 const AllDoctors = () => {
+
+  const [experts, setExperts] = useState([
+    {
+      name: "",
+      gender: "",
+      contact_no: "",
+      uid:""
+    }
+  ]);
+  useEffect(() => {
+    console.log("Fetching experts");
+    axios.get('/api/v1/admin/getlistbyrole/EXPERT')
+      .then(response => {
+        console.log(response.data)
+        setExperts(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching questions:', error);
+      });
+
+  }, []);
+
+  const formatDate = (date)=> {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  const formatTime = (date)=> {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  }
+
+  const handleSendAppointment = async(event) =>{
+    console.log(event.target.id);
+    const userid = localStorage.getItem('id');
+    console.log(userid);
+
+    const currentDateTime = new Date();
+
+    const Appointment = {
+      Patient_ID: userid,
+      Expert_ID: event.target.id,
+      Date: formatDate(currentDateTime),
+      Time: formatTime(currentDateTime)
+    }
+    console.log(Appointment.Date,"                   " ,Appointment.Time)
+    try{
+
+      const response = await axios({
+        method: 'post',
+        url: `/api/v1/appointment/send-appointment-request`,
+        data: Appointment,
+      });
+      console.log(response);
+
+    }catch(excecption){
+      console.log(excecption);
+    }
+  }
+
   return (
     <Fragment>
-        <Row>
-          <Col sm="12">
-            <div className="iq-card">
-              <div className="iq-card-header d-flex justify-content-between">
-                <div className="iq-header-title">
-                  <h4 className="card-title">Docters List</h4>
-                </div>
+      <Row>
+        <Col sm="12">
+          <div className="iq-card">
+            <div className="iq-card-header d-flex justify-content-between">
+              <div className="iq-header-title">
+                <h4 className="card-title">Docters List</h4>
               </div>
             </div>
-          </Col>
-          
+          </div>
+        </Col>
+
+        {experts.map((expert, index) => (
           <Col sm="6" md="3">
             <div className="iq-card">
               <div className="iq-card-body text-center">
@@ -38,249 +105,27 @@ const AllDoctors = () => {
                   />
                 </div>
                 <div className="iq-doc-info mt-3">
-                  <Link to = "/home/doctors-profile"><h4> Dr. Paul Molive</h4></Link>
-                  <p className="mb-0">Heart Surgeons</p>
-                  <Link to="#">www.demo.com</Link>
+                  <Link to="/home/doctors-profile"><h4> {expert.name}</h4></Link>
+                  <p className="mb-0">{expert.gender}</p>
+                  <Link to={"/home/doctors-profile/"+expert.contact_no}>View Profile</Link>
                 </div>
                 <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
+                  {/* <p className="mb-0">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
                     auctor non erat non gravida. In id ipsum consequat
-                  </p>
+                  </p> */}
                 </div>
                 <br></br>
-                <Button to="#" className="btn btn-primary">
-                  Send Appointment Request 
+                <Button to="#" id = {expert.uid} onClick = {handleSendAppointment} className="btn btn-primary">
+                  Send Appointment Request
                 </Button>
               </div>
             </div>
           </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user2}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <Link to = "/home/doctors-profile"><h4> Dr. Paul Molive</h4></Link>
-                  <p className="mb-0">Heart Surgeons</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <br></br>
-                <Button to="#" className="btn btn-primary">
-                  Send Appointment Request 
-                </Button>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user2}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <Link to = "/home/doctors-profile"><h4> Dr. Paul Molive</h4></Link>
-                  <p className="mb-0">Heart Surgeons</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <br></br>
-                <Button to="#" className="btn btn-primary">
-                  Send Appointment Request 
-                </Button>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user2}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <Link to = "/home/doctors-profile"><h4> Dr. Paul Molive</h4></Link>
-                  <p className="mb-0">Heart Surgeons</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <br></br>
-                <Button to="#" className="btn btn-primary">
-                  Send Appointment Request 
-                </Button>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user2}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <Link to = "/home/doctors-profile"><h4> Dr. Paul Molive</h4></Link>
-                  <p className="mb-0">Heart Surgeons</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <br></br>
-                <Button to="#" className="btn btn-primary">
-                  Send Appointment Request 
-                </Button>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user2}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <Link to = "/home/doctors-profile"><h4> Dr. Paul Molive</h4></Link>
-                  <p className="mb-0">Heart Surgeons</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <br></br>
-                <Button to="#" className="btn btn-primary">
-                  Send Appointment Request 
-                </Button>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user2}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <Link to = "/home/doctors-profile"><h4> Dr. Paul Molive</h4></Link>
-                  <p className="mb-0">Heart Surgeons</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <br></br>
-                <Button to="#" className="btn btn-primary">
-                  Send Appointment Request 
-                </Button>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user2}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <Link to = "/home/doctors-profile"><h4> Dr. Paul Molive</h4></Link>
-                  <p className="mb-0">Heart Surgeons</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <br></br>
-                <Button to="#" className="btn btn-primary">
-                  Send Appointment Request 
-                </Button>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user2}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <Link to = "/home/doctors-profile"><h4> Dr. Paul Molive</h4></Link>
-                  <p className="mb-0">Heart Surgeons</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <br></br>
-                <Button to="#" className="btn btn-primary">
-                  Send Appointment Request 
-                </Button>
-              </div>
-            </div>
-          </Col>
-          
-        </Row>
+        ))}
+
+
+      </Row>
     </Fragment>
   );
 };

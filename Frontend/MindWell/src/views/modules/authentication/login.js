@@ -1,4 +1,4 @@
-import React, { Fragment,useState } from 'react'
+import React, { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Col, Container, Form, Row } from 'react-bootstrap'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import img from "../../../assets/images/login/4.png"
 import my_logo from "../../../assets/images/custome-logo.png"
 import axiosInstance from '../../../axiosInstance';
+import axios from 'axios';
+
 
 const LoginPage = () => {
 
@@ -50,37 +52,27 @@ const LoginPage = () => {
         e.preventDefault();
         const validationErrors = validateForm(loginDetails);
         if (Object.keys(validationErrors).length === 0) {
-
-            axiosInstance.post('/auth/authenticate', loginDetails)
-                .then((response) => {
-                    console.log(response.data);
-                    const token = response.data;
-                    console.log(token)
-                    // Store token in local storage (not secure, consider better methods)
-                    
-                    localStorage.setItem('id', token.id);
-                    localStorage.setItem('username', loginDetails.email);
-                    localStorage.setItem('access_token', token.access_token);
-                    localStorage.setItem('role',response.data.role);
-
-                    console.log("login Sucessful");
-                    console.log(response.data.role)
-                    if(response.data.role=="ADMIN")
-                        navigate('/home/AdminDashboard');
-                    if(response.data.role=="EXPERT")
-                        navigate('/home/ExpertDashboard');
-                    if(response.data.role=="SENIOR_DOCTOR")
-                        navigate('/home/DoctorDashboard');
-                    if(response.data.role=="MODERATOR")
-                        navigate('/home/ModeratorDashboard')
-                    else if(response.data.role=="PATIENT")
-                        navigate('/home/PatientDashboard');
-                    
-                })
-                .catch((error) => {
-                    setAlert("Username or Password is Incorrect")
-                    console.error('Login failed:', error);
-                })
+            console.log(loginDetails)
+            const response = await axios({
+                method: 'post',
+                url: `/api/v1/auth/authenticate`,
+                data: loginDetails,
+            });
+            const token = response.data;
+            localStorage.setItem('id', token.id);
+            localStorage.setItem('username', loginDetails.email);
+            localStorage.setItem('access_token', token.access_token);
+            localStorage.setItem('role', response.data.role);
+            if (response.data.role == "ADMIN")
+                navigate('/home/AdminDashboard');
+            if (response.data.role == "EXPERT")
+                navigate('/home/ExpertDashboard');
+            if (response.data.role == "SENIOR_DOCTOR")
+                navigate('/home/DoctorDashboard');
+            if (response.data.role == "MODERATOR")
+                navigate('/home/ModeratorDashboard')
+            else if (response.data.role == "PATIENT")
+                navigate('/home/PatientDashboard');
         }
         else {
             console.log("Validataion Failed")

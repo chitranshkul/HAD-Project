@@ -9,7 +9,7 @@ import { Button, ButtonGroup, Dropdown } from "react-bootstrap";
 
 //Axios
 import axiosInstance from '../axiosInstance';
-
+import axios from 'axios';
 
 const AdminDashboard = () => {
 
@@ -45,6 +45,7 @@ const AdminDashboard = () => {
         setSelectedOption(dropdownOptions[option]);
     };
 
+    const navigate = useNavigate();
 
     useEffect(() => {
         const accessToken = localStorage.getItem('access_token');
@@ -62,74 +63,46 @@ const AdminDashboard = () => {
     }, [selectedOption]);
 
 
-
-    const navigate = useNavigate();
     useEffect(() => {
+        const accessToken = localStorage.getItem('access_token');
+        const headers = {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            Authorization: `Bearer ${accessToken}`,
+        };
 
-        const getTotalAdmin = () => {
-            const accessToken = localStorage.getItem('access_token');
-            try {
+        axios.get('/api/v1/admin/getcount/ADMIN', { headers: headers })
+            .then(response => {
+                console.log("Admins: ", response.data);
+                setToalAdmin(response.data);
+            })
+            axios.get('/api/v1/admin/getcount/MODERATOR', { headers: headers })
+            .then(response => {
+                console.log("Admins: ", response.data);
+                setTotalModerators(response.data);
+            })
+            axios.get('/api/v1/admin/getcount/PATIENT', { headers: headers })
+            .then(response => {
+                console.log("Admins: ", response.data);
+                setTotalPatients(response.data);
+            })
+            axios.get('/api/v1/admin/getcount/EXPERT', { headers: headers })
+            .then(response => {
+                console.log("Admins: ", response.data);
+                setTotalExperts(response.data);
+            })
+            axios.get('/api/v1/admin/getcount/SENIOR_DOCTOR', { headers: headers })
+            .then(response => {
+                console.log("Admins: ", response.data);
+                setTotalDoctors(response.data);
+            })
 
-                const headers = {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    Authorization: `Bearer ${accessToken}`,
-                };
-                axiosInstance.get('/admin/getcount/ADMIN', { headers: headers }).then((response) => {
-                    console.log("Admins: ", response.data);
-                    setToalAdmin(response.data);
-                });
-
-            } catch (error) {
-                console.log(error);
-            }
-        }
-
-        const getTotalModerator = () => {
-            const accessToken = localStorage.getItem('access_token');
-            try {
-
-                const headers = {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    Authorization: `Bearer ${accessToken}`,
-                };
-                axiosInstance.get('/admin/getcount/MODERATOR', { headers: headers }).then((response) => {
-                    console.log("Admins: ", response.data);
-                    setTotalModerators(response.data);
-                });
-
-            } catch (error) {
-                console.log(error);
-            }
-        }
-
-        const getTotalExpert = () => {
-            const accessToken = localStorage.getItem('access_token');
-            try {
-
-                const headers = {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    Authorization: `Bearer ${accessToken}`,
-                };
-                axiosInstance.get('/admin/getcount/EXPERT', { headers: headers }).then((response) => {
-                    console.log("Admins: ", response.data);
-                    setTotalExperts(response.data);
-                });
-
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        getTotalAdmin()
-        getTotalModerator()
-        getTotalExpert()
 
     }, [])
-    useEffect(() => {
 
-    }, [totalModerators])
+
+
+
     // useEffect(()=>{
     //     const accessToken = localStorage.getItem('access_token');
     //     try {

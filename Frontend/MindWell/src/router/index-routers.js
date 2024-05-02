@@ -151,7 +151,7 @@ export const IndexRouters = [
                 element:<AddDoctors/>
             },
             {
-                path:'doctors-profile',
+                path:'doctors-profile/:uid',
                 element:<DoctorProfile/>
             },
             {
