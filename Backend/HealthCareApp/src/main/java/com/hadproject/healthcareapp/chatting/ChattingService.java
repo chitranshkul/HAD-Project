@@ -41,35 +41,29 @@ public class ChattingService {
 
     }
 
-    public Optional<List<ChattingResponse>> GetChat(String senderemail , String receiveremail) {
+    public Optional<List<ChattingResponse>> GetChat(String senderemail, String receiveremail) {
         try {
             System.out.println(senderemail);
 
             Optional<User> senderOptional = userRepository.findByEmail(senderemail);
-
             Optional<User> receiverOptional = userRepository.findByEmail(receiveremail);
 
             if (senderOptional.isPresent() && receiverOptional.isPresent()) {
                 User sender = senderOptional.get();
-
                 User receiver = receiverOptional.get();
 
-                Optional<List<Chatting>> chatMessages = chattingRepository.findByFromidAndToid(sender,receiver);
+                Optional<List<Chatting>> chatMessages = chattingRepository.findByFromidAndToid(sender, receiver);
+                Optional<List<Chatting>> chattingsMessages = chattingRepository.findByFromidAndToid(receiver, sender);
 
+                List<ChattingResponse> chatResponses = new ArrayList<>();
 
                 if (chatMessages.isPresent()) {
-
-                    List<ChattingResponse> chatResponses = new ArrayList<>();
                     List<Chatting> chat = chatMessages.get();
 
                     for (Chatting message : chat) {
-//                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-//                        LocalDateTime dateTime = LocalDateTime.parse(message.getDate(), formatter);
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-
                         LocalDateTime dateTime = LocalDateTime.parse(message.getDate(), formatter);
 
-                        // Format the date and time
                         String formattedDateTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss, EEE MMM dd yyyy"));
 
                         ChattingResponse chatResponse = ChattingResponse.builder()
@@ -79,19 +73,34 @@ public class ChattingService {
                                 .date(formattedDateTime)
                                 .build();
                         chatResponses.add(chatResponse);
-                    }                    // Assuming you want to return a list of chat responses
-
-                    // Sort the chat responses based on date and time
-                    Collections.sort(chatResponses, Comparator.comparing(ChattingResponse::getDate).reversed());
-
-                    return Optional.of(chatResponses);
-                } else {
-                    // If no chat messages found between the sender and receiver, return Optional.empty()
-                    return Optional.empty();
+                    }
                 }
+
+                if (chattingsMessages.isPresent()) {
+                    List<Chatting> chattings = chattingsMessages.get();
+
+                    for (Chatting message : chattings) {
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+                        LocalDateTime dateTime = LocalDateTime.parse(message.getDate(), formatter);
+
+                        String formattedDateTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss, EEE MMM dd yyyy"));
+
+                        ChattingResponse chatResponse = ChattingResponse.builder()
+                                .senderId(message.getFromid().getId())
+                                .receiverId(message.getToid().getId())
+                                .message(message.getMessage())
+                                .date(formattedDateTime)
+                                .build();
+                        chatResponses.add(chatResponse);
+                    }
+                }
+
+                // Sort the chat responses based on date and time
+                Collections.sort(chatResponses, Comparator.comparing(ChattingResponse::getDate).reversed());
+
+                return Optional.of(chatResponses);
             } else {
                 // If either sender or receiver not found, return Optional.empty()
-
                 return Optional.empty();
             }
         } catch (Exception e) {
@@ -100,4 +109,5 @@ public class ChattingService {
             return Optional.empty();
         }
     }
+
 }
