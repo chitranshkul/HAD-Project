@@ -82,7 +82,7 @@ public class ChattingService {
                     }                    // Assuming you want to return a list of chat responses
 
                     // Sort the chat responses based on date and time
-                    chatResponses.sort(Comparator.comparing(ChattingResponse::getDate));
+                    Collections.sort(chatResponses, Comparator.comparing(ChattingResponse::getDate).reversed());
 
                     return Optional.of(chatResponses);
                 } else {

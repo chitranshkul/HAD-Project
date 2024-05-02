@@ -14,7 +14,7 @@ import java.util.Optional;
 public class BlogController {
 
     @Autowired
-    BlogService blogService;
+    private BlogService blogService;
     @Autowired
     private TokenRepository tokenRepository;
 
