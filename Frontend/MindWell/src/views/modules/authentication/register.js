@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import axiosInstance from '../../../axiosInstance';
+import axios from 'axios';
+
 
 import './register.css';
 
@@ -153,43 +154,43 @@ const Register = () => {
 
     const validationErrors = validateForm(userDetail);
     if (Object.keys(validationErrors).length === 0) {
-      axiosInstance.post('/auth/register', userDetail)
-        .then((response) => {
-
-          const token = response.data;
-          console.log(token);
-          localStorage.setItem('id', token.id);
-          localStorage.setItem('access_token', token.access_token);
-          localStorage.setItem('username', userDetail.email);
-          localStorage.setItem('OTPStatus', 'register');
-          setOTPDetials({
-            ...otpDetails,
-            email: userDetail.email
-          });
-          const accessToken = localStorage.getItem('access_token');
-
-          const headers = {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            Authorization: `Bearer ${accessToken}`,
-          };
-          console.log("Now Sending OTP: ",headers);
-          axiosInstance.post('/users/send-otp',{email: userDetail.email}, { headers: headers})
-            .then((response) => {
-              console.log(response.data);
-              navigate('/confirm-mail');
-            })
-            .catch((error) => {
-              console.log("This Errors is in Sending OTP");
-              console.log(error);
-            });
-          // navigate('/sign-in');
-        })
-        .catch((error) => {
-          console.log(error);
-        });
 
 
+      const response = await axios({
+        method: 'post',
+        url: `/api/v1/auth/register`,
+        data: userDetail,
+      });
+
+      const token = response.data;
+      console.log(token);
+      localStorage.setItem('id', token.id);
+      localStorage.setItem('access_token', token.access_token);
+      localStorage.setItem('username', userDetail.email);
+      localStorage.setItem('OTPStatus', 'register');
+      setOTPDetials({
+        ...otpDetails,
+        email: userDetail.email
+      });
+      const accessToken = localStorage.getItem('access_token');
+
+      const headers = {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization: `Bearer ${accessToken}`,
+      };
+      console.log("Now Sending OTP: ", headers);
+
+
+      const response1 = await axios({
+        method: 'post',
+        url: `/api/v1/users/send-otp`,
+        data: { email: userDetail.email },
+      });
+
+      navigate('/confirm-mail');
+
+      
     } else {
       console.log("Validataion Failed")
       setErrors(validationErrors);

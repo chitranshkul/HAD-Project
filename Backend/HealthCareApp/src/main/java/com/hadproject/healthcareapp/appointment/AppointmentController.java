@@ -1,15 +1,12 @@
 package com.hadproject.healthcareapp.appointment;
 
-import com.hadproject.healthcareapp.admin.RoleListResponse;
-import com.hadproject.healthcareapp.appointment.AppointmentRequest;
-import com.hadproject.healthcareapp.patient.PatientService;
-import com.hadproject.healthcareapp.user.Role;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,11 +22,7 @@ public class AppointmentController {
 
     @PostMapping("/send-appointment-request")
     public String sendAppointmentRequest(@RequestBody AppointmentRequest appointmentRequest) {
-        int patientId = appointmentRequest.getPatient_ID();
-        int expertId = appointmentRequest.getExpert_ID();
-        System.out.println("******************************** HII I m gramya , patientID ********************************");
-        System.out.println("Patient ID: " + patientId);
-        System.out.println("expert ID: " + expertId);
+
         return appointmentService.sendAppointmentRequest(appointmentRequest);
     }
     @PostMapping("/AcceptOrReject-request/{id}/{status}")
@@ -46,12 +39,75 @@ public class AppointmentController {
 
     @GetMapping("/GetAppointmentsByDate/{date}")
     public ResponseEntity<List<Appointment>> getAppointmentsByDate(@PathVariable LocalDate date) {
-         Optional<List<Appointment>> appointmentDetails = appointmentService.getAppointmentsByDate(date);
+        Optional<List<Appointment>> appointmentDetails = appointmentService.getAppointmentsByDate(date);
 
         return appointmentDetails
                 .map(users -> ResponseEntity.ok().body(users))
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    
 
+
+
+    //Expert Controller
+    @GetMapping("/RoleBasedAppointment/{userId}")
+    public ResponseEntity<List<RoleBasedAppointmentResponse>> roleBasedAppointment(@PathVariable Integer userId) {
+        Optional<List<RoleBasedAppointmentResponse>> appointmentOptional = appointmentService.viewAppointmentDetails(userId);
+
+        return appointmentOptional.map(roleBasedAppointmentResponses -> ResponseEntity.ok().body(roleBasedAppointmentResponses)).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    //Patient Controller
+    @GetMapping("/RoleBasedAppointment2/{userId}")
+    public ResponseEntity<List<RoleBasedAppointmentResponse>> roleBasedAppointment2(@PathVariable Integer userId) {
+        Optional<List<RoleBasedAppointmentResponse>> appointmentOptional = appointmentService.viewAppointmentDetails2(userId);
+
+        return appointmentOptional.map(roleBasedAppointmentResponses -> ResponseEntity.ok().body(roleBasedAppointmentResponses)).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/genderDistributionByExpert/{userId}")
+    public List<GenderDistributionResponse> getGenderDistribution(@PathVariable Integer userId){
+        List<GenderDistributionResponse> response = appointmentService.getGenderDistributionForExpert(userId);
+        return response;
+    }
+
+    @GetMapping("/appointmentCountByExpert/{userId}")
+    public List<Integer> getAppointmentCount(@PathVariable Integer userId){
+        return appointmentService.getAppointmentCountsByExpert(userId);
+    }
+//    @GetMapping("/RoleBasedAppointment")
+//    public ResponseEntity<List<RoleBasedAppointmentResponse>> roleBasedAppointment(HttpServletRequest request) {
+//        String headerToken = request.getHeader("Authorization");
+//        if (headerToken != null && headerToken.startsWith("Bearer ")) {
+//            String token = headerToken.substring(7); // Extract the token part
+//            Optional<List<RoleBasedAppointmentResponse>> appointmentOptional = appointmentService.viewAppointmentDetails(token);
+//
+//            return appointmentOptional.map(roleBasedAppointmentResponses -> ResponseEntity.ok().body(roleBasedAppointmentResponses)).orElseGet(() -> ResponseEntity.notFound().build());
+//        } else {
+//            // Handle missing or invalid token in the header
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
 }
+
+
+
+
+
+//    @GetMapping("/RoleBasedAppointment")
+//    public ResponseEntity<List<RoleBasedAppointmentResponse>> roleBasedAppointment(@RequestHeader("Authorization") String token) {
+//        Optional<List<RoleBasedAppointmentResponse>> appointmentOptional = appointmentService.viewAppointmentDetails(token);
+//
+//        return appointmentOptional.map(roleBasedAppointmentResponses -> ResponseEntity.ok().body(roleBasedAppointmentResponses)).orElseGet(() -> ResponseEntity.notFound().build());
+//    }
+//
+
+
+
+
+
+
+
+
+
+

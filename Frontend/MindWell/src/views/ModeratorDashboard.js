@@ -4,6 +4,8 @@ import { Col, Nav, Row, Tab, Table, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 import axiosInstance from "../axiosInstance";
+import axios from 'axios';
+
 
 const ModeratorDashboard = () => {
 
@@ -24,19 +26,28 @@ const ModeratorDashboard = () => {
 
                 const headers = {
                     "Content-Type": "application/json",
-                    // "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Origin": "*",
                     Authorization: `Bearer ${accessToken}`,
                 };
 
-                axiosInstance.get('/qaresponse/flaggedallquestions', { headers: headers }).then((response) => {
-                    console.log("Flag Questions", response.data);
-                    setFlaggedQuestion(response.data);
-                });
 
-                axiosInstance.get('/qaresponse/flaggedallresponse', { headers: headers }).then((response) => {
-                    console.log("Flag Responses", response.data);
-                    setFlaggedResponses(response.data);
-                });
+                axios.get('/api/v1/qaresponse/flaggedallquestions', { headers: headers })
+                    .then(response => {
+                        console.log("Admins: ", response.data);
+                        setFlaggedQuestion(response.data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching responses', error);
+                    });
+
+                axios.get('/api/v1/qaresponse/flaggedallresponse', { headers: headers })
+                    .then(response => {
+                        console.log("Admins: ", response.data);
+                        setFlaggedResponses(response.data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching responses:', error);
+                    });
 
             }
             catch (error) {
@@ -103,7 +114,7 @@ const ModeratorDashboard = () => {
                                 <div className="d-flex justify-content-between tasks-card" role="alert">
                                     <div className="custom-control custom-checkbox">
                                         <label className="custom-control-label" htmlFor="customCheck11">
-                                            {response.answers_textf}
+                                            {response.answers_text}
                                         </label>
                                     </div>
                                     <div>

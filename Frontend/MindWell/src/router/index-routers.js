@@ -89,6 +89,7 @@ import { Navigate } from "react-router-dom";
 import ModeratorDashboard from "../views/ModeratorDashboard";
 import DoctorDashboard from "../views/DoctorDashboard";
 import PatientDashboard from "../views/PatienetDashboard";
+import DoctorsList from "../views/modules/doctors/doctors-list";
 export const IndexRouters = [
     {
         path: '',
@@ -148,10 +149,10 @@ export const IndexRouters = [
             },
             {
                 path:'add-doctors',
-                element:<AddDoctors/>
+                element:<DoctorsList/>
             },
             {
-                path:'doctors-profile',
+                path:'doctors-profile/:uid',
                 element:<DoctorProfile/>
             },
             {

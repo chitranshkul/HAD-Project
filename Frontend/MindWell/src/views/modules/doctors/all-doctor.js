@@ -1,5 +1,6 @@
-import React, { Fragment } from "react";
-import { Col, Row } from "react-bootstrap";
+import React, { Fragment, useState, useEffect } from "react";
+import { Col, Row, Button } from "react-bootstrap";
+import axios from "axios";
 
 // Images
 import user1 from "../../../assets/images/user/12.jpg";
@@ -12,66 +13,87 @@ import user7 from "../../../assets/images/user/18.jpg";
 
 // Link
 import { Link } from "react-router-dom";
+import { exp } from "@amcharts/amcharts5/.internal/core/util/Ease";
 
 const AllDoctors = () => {
+
+  const [experts, setExperts] = useState([
+    {
+      name: "",
+      gender: "",
+      contact_no: "",
+      uid:""
+    }
+  ]);
+  useEffect(() => {
+    console.log("Fetching experts");
+    axios.get('/api/v1/admin/getlistbyrole/EXPERT')
+      .then(response => {
+        console.log(response.data)
+        setExperts(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching questions:', error);
+      });
+
+  }, []);
+
+  const formatDate = (date)=> {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  const formatTime = (date)=> {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  }
+
+  const handleSendAppointment = async(event) =>{
+    console.log(event.target.id);
+    const userid = localStorage.getItem('id');
+    console.log(userid);
+
+    const currentDateTime = new Date();
+
+    const Appointment = {
+      Patient_ID: userid,
+      Expert_ID: event.target.id,
+      Date: formatDate(currentDateTime),
+      Time: formatTime(currentDateTime)
+    }
+    console.log(Appointment.Date,"                   " ,Appointment.Time)
+    try{
+
+      const response = await axios({
+        method: 'post',
+        url: `/api/v1/appointment/send-appointment-request`,
+        data: Appointment,
+      });
+      console.log(response);
+
+    }catch(excecption){
+      console.log(excecption);
+    }
+  }
+
   return (
     <Fragment>
-        <Row>
-          <Col sm="12">
-            <div className="iq-card">
-              <div className="iq-card-header d-flex justify-content-between">
-                <div className="iq-header-title">
-                  <h4 className="card-title">Docters List</h4>
-                </div>
+      <Row>
+        <Col sm="12">
+          <div className="iq-card">
+            <div className="iq-card-header d-flex justify-content-between">
+              <div className="iq-header-title">
+                <h4 className="card-title">Docters List</h4>
               </div>
             </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user1}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Anna Mull</h4>
-                  <p className="mb-0">Cardiologists</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
+          </div>
+        </Col>
+
+        {experts.map((expert, index) => (
           <Col sm="6" md="3">
             <div className="iq-card">
               <div className="iq-card-body text-center">
@@ -83,686 +105,27 @@ const AllDoctors = () => {
                   />
                 </div>
                 <div className="iq-doc-info mt-3">
-                  <h4> Dr. Paul Molive</h4>
-                  <p className="mb-0">Heart Surgeons</p>
-                  <Link to="#">www.demo.com</Link>
+                  <Link to="/home/doctors-profile"><h4> {expert.name}</h4></Link>
+                  <p className="mb-0">{expert.gender}</p>
+                  <Link to={"/home/doctors-profile/"+expert.contact_no}>View Profile</Link>
                 </div>
                 <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
+                  {/* <p className="mb-0">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
                     auctor non erat non gravida. In id ipsum consequat
-                  </p>
+                  </p> */}
                 </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
+                <br></br>
+                <Button to="#" id = {expert.uid} onClick = {handleSendAppointment} className="btn btn-primary">
+                  Send Appointment Request
+                </Button>
               </div>
             </div>
           </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user3}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Terry Aki</h4>
-                  <p className="mb-0">Medicine Specialists</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user4}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Poppa Cherry</h4>
-                  <p className="mb-0">Family Physicians</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user5}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Saul T. Balls</h4>
-                  <p className="mb-0">Gynaecology</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user6}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Hal Appeno </h4>
-                  <p className="mb-0">MD</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user7}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Polly Tech</h4>
-                  <p className="mb-0">Eye Special</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user1}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Pat Agonia</h4>
-                  <p className="mb-0">Therapy Special</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user2}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Barry Cade</h4>
-                  <p className="mb-0">Heart Surgeons</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user3}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr.Jimmy Changa</h4>
-                  <p className="mb-0">Cardiologists</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user4}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Sue Vaneer</h4>
-                  <p className="mb-0">Orthopedics Special</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user5}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Monty Carlo</h4>
-                  <p className="mb-0">Anesthesiologists</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user6}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Rick O'Shea</h4>
-                  <p className="mb-0">General</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user7}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Bunny Joy</h4>
-                  <p className="mb-0">Gynaecology</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user1}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Shonda Leer</h4>
-                  <p className="mb-0">Orthopedics Special</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-          <Col sm="6" md="3">
-            <div className="iq-card">
-              <div className="iq-card-body text-center">
-                <div className="doc-profile">
-                  <img
-                    className="rounded-circle img-fluid avatar-80"
-                    src={user2}
-                    alt="profile"
-                  />
-                </div>
-                <div className="iq-doc-info mt-3">
-                  <h4> Dr. Ira Membrit</h4>
-                  <p className="mb-0">MD</p>
-                  <Link to="#">www.demo.com</Link>
-                </div>
-                <div className="iq-doc-description mt-2">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                    auctor non erat non gravida. In id ipsum consequat
-                  </p>
-                </div>
-                <div className="iq-doc-social-info mt-3 mb-3">
-                  <ul className="m-0 p-0 list-inline">
-                    <li>
-                      <Link to="#">
-                        <i className="ri-facebook-fill"></i>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-twitter-fill"></i>
-                      </Link>{" "}
-                    </li>
-                    <li>
-                      <Link to="#">
-                        <i className="ri-google-fill"></i>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <Link to="#" className="btn btn-primary">
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          </Col>
-        </Row>
+        ))}
+
+
+      </Row>
     </Fragment>
   );
 };

@@ -2,6 +2,9 @@ import React, { Fragment, useState, useEffect } from "react";
 import { useNavigate, Link } from 'react-router-dom'
 import { Col, Row, Card, Form, FormControl, Button } from "react-bootstrap";
 import axiosInstance from '../../../axiosInstance';
+import axios from 'axios';
+
+
 const HighLevel = () => {
   // State to hold the search query
 
@@ -21,42 +24,16 @@ const HighLevel = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-
-    const checkEligiblity = async () => {
-      const accessToken = localStorage.getItem('access_token');
-      const userid = localStorage.getItem('id');
-      setAddedQuestion({ ...addedQuestion, uid: userid });
-
-      if (accessToken === null) {
-        navigate('/sign-in');
-      }
-    }
-
-    const fetchQuestions = () => {
-      const accessToken = localStorage.getItem('access_token');
-
-      try {
-
-        const headers = {
-          "Content-Type": "application/json",
-          // "Access-Control-Allow-Origin": "*",
-          Authorization: `Bearer ${accessToken}`,
-        };
-
-        axiosInstance.get('/qaresponse/allQuestions', { headers: headers }).then((response) => {
-          console.log("Admins: ", response.data);
-          setQuestions(response.data);
-        });
-
-      }
-      catch (error) {
-        console.error('Error fetching data:', error);
-      }
-
-    }
-    if (checkEligiblity())
-      fetchQuestions();
-  }, [navigator]);
+    // Make GET request to /qaresponse/allQuestions
+    setAddedQuestion({ ...addedQuestion, uid: localStorage.getItem('id') });
+    axios.get('/api/v1/qaresponse/allQuestions')
+      .then(response => {
+        setQuestions(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching questions:', error);
+      });
+  }, []);
 
 
   // Function to handle search query change
@@ -89,26 +66,30 @@ const HighLevel = () => {
   };
 
 
-  const handleAddQuestionSubmit = (event) => {
+  const handleAddQuestionSubmit = async (event) => {
     event.preventDefault();
     const accessToken = localStorage.getItem('access_token');
+
+    console.log("Added Question: ", addedQuestion);
     try {
-
-      const headers = {
-        "Content-Type": "application/json",
-        // "Access-Control-Allow-Origin": "*",
-        Authorization: `Bearer ${accessToken}`,
-      };
-
-
-      axiosInstance.post('/qaresponse/addquestion', addedQuestion, { headers: headers }).then((response) => {
-        console.log("Status", response.data);
-        axiosInstance.get('/qaresponse/allQuestions', { headers: headers }).then((response) => {
-          console.log("Admins: ", response.data);
-          setQuestions(response.data);
-        });
+      const response = await axios({
+        method: 'post',
+        url: `/api/v1/qaresponse/addquestion`,
+        data: addedQuestion,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
 
+      axios.get('/api/v1/qaresponse/allQuestions')
+        .then(response => {
+          setQuestions(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching questions:', error);
+        });
 
     }
     catch (error) {
