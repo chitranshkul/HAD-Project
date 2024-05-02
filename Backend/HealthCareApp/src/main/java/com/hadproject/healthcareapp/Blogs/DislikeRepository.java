@@ -14,7 +14,7 @@ public interface DislikeRepository extends JpaRepository<Dislike, Integer> {
     @Query("SELECT l FROM Dislike l WHERE l.Uid.id = :userId AND l.Bid.id = :bid")
     Optional<Dislike> findByUserIDAndBlogID(@Param("userId") int userId, @Param("bid") int bid);
 
-    Optional<Dislike> findByUidAndBid(User user,Blog blogid);
+//    Optional<Dislike> findByUidAndBid(User user,Blog blogid);
 
 }
 

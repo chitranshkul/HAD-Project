@@ -1,8 +1,7 @@
 package com.hadproject.healthcareapp.admin;
 
-import com.hadproject.healthcareapp.Courses.Courses;
-import com.hadproject.healthcareapp.auth.AuthenticationService;
-import com.hadproject.healthcareapp.department.Department;
+
+
 import com.hadproject.healthcareapp.user.Role;
 import com.hadproject.healthcareapp.user.User;
 import com.hadproject.healthcareapp.user.UserDetail;
