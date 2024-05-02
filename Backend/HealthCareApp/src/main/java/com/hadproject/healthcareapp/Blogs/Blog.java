@@ -19,7 +19,7 @@ public class Blog {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="id")
     int id;
-    String BlogItem;
+    String blogItem;
     String author;
-    String Title;
+    String title;
 }

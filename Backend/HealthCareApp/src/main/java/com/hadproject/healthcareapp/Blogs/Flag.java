@@ -25,12 +25,12 @@ public class Flag {
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name="Uid")
-    private User Uid;
+    private User uid;
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "Bid")
-    private Blog Bid;
+    private Blog bid;
 
 }
 

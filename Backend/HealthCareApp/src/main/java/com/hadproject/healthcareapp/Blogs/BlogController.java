@@ -129,26 +129,43 @@ public class BlogController {
         }
     }
 
-//    @GetMapping("/SearchBlog/{BlogItem}")
-//    public ResponseEntity<List<BlogSearchResponse>>  SearchBlog(@RequestHeader("Authorization") String token,
-//                                                   @RequestBody BlogSearchRequest blogSearchRequest ) {
-//        System.out.println("*************************TESTING**************************************");
-//        try {
-//            String jwtToken;
-//
-//            jwtToken = token.substring(7); // Extract JWT part from token
-//            System.out.println("Token before substring: " + token);
-//            System.out.println("JWT part after substring: " + jwtToken);
-//
-//            int userId = getUserIdFromToken(jwtToken); // Extract user ID from token
-//            System.out.println("$$$$$$$$"+userId);
-//
-//            String str = blogService.SearchBlog(userId, blogSearchRequest);
-//            return ResponseEntity.ok(null);
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body(null); // Return an empty list or handle the error differently
-//        }
-//    }
+    @GetMapping("/SearchBlog")
+    public ResponseEntity<List<BlogSearchResponse>> searchBlog(
+            @RequestHeader("Authorization") String token,
+            @RequestBody BlogSearchRequest blogSearchRequest) {
+
+        try {
+            String jwtToken = token.substring(7); // Extract JWT part from token
+            int userId = getUserIdFromToken(jwtToken); // Extract user ID from token
+
+            List<BlogSearchResponse> blogs = blogService.searchBlog(userId,blogSearchRequest);
+            return ResponseEntity.ok(blogs);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null); // Return an empty list or handle the error differently
+        }
+    }
+
+
+
+    @GetMapping("/NoOfLikesinBlog/{Bid}")
+    public ResponseEntity<Integer> NoOfLikesinBlog(@RequestHeader("Authorization") String token, @PathVariable Integer Bid) {
+        try {
+            String jwtToken = token.substring(7); // Extract JWT part from token
+            System.out.println("Token before substring: " + token);
+            System.out.println("JWT part after substring: " + jwtToken);
+
+            int userId = getUserIdFromToken(jwtToken); // Extract user ID from token
+
+            int likesCount = blogService.getLikesCountForBlog(userId, Bid);
+            return ResponseEntity.ok(likesCount);
+        } catch (Exception e) {
+            // Handle the exception by returning a default value
+            return ResponseEntity.badRequest().body(0);
+        }
+    }
 
 
 }
+
+
+

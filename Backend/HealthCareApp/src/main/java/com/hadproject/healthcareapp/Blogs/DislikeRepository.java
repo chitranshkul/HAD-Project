@@ -4,17 +4,28 @@ import com.hadproject.healthcareapp.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-
+@Repository
 public interface DislikeRepository extends JpaRepository<Dislike, Integer> {
 
 
 
-    @Query("SELECT l FROM Dislike l WHERE l.Uid.id = :userId AND l.Bid.id = :bid")
+    @Query("SELECT l FROM Dislike l WHERE l.uid.id = :userId AND l.bid.id = :bid")
     Optional<Dislike> findByUserIDAndBlogID(@Param("userId") int userId, @Param("bid") int bid);
 
-    Optional<Dislike> findByUidAndBid(User user,Blog blogid);
+//    int countByBid(Blog blogEntry);
 
+//    Optional<Dislike> findByUidAndBid(User user,Blog blogid);
+
+//    @Query(value = "SELECT COUNT(*) FROM Dislike WHERE bid_id = :bidId", nativeQuery = true)
+//    int countDislikesByBidId(@Param("bidId") Blog bidId);
+//    int countByBid(Blog blog);
+
+
+    @Query("SELECT COUNT(l) FROM Dislike l WHERE l.bid.id = :bidId")
+    int countByBid_Id(@Param("bidId") Integer bidId);
+    int countByBidId(Integer blogId);
 }
 

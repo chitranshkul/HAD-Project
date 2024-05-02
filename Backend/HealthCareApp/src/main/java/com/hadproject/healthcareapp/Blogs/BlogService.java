@@ -67,9 +67,9 @@ public class BlogService {
 
             // Create a new blog entry using the builder pattern
             Blog blog = Blog.builder()
-                    .BlogItem(blogRequest.getBlogItem())
+                    .blogItem(blogRequest.getBlogItem())
                     .author(author)
-                    .Title(blogRequest.getTitle())
+                    .title(blogRequest.getTitle())
                     .build();
 
             // Save the blog entry
@@ -134,8 +134,8 @@ public class BlogService {
         }
 
         Like like = Like.builder()
-                .Uid(user)
-                .Bid(blog)
+                .uid(user)
+                .bid(blog)
                 .build();
 
         likeRepository.save(like);
@@ -168,8 +168,8 @@ public class BlogService {
         }
 
         Dislike dislike = Dislike.builder()
-                .Uid(user)
-                .Bid(blog)
+                .uid(user)
+                .bid(blog)
                 .build();
 
         dislikeRepository.save(dislike);
@@ -198,8 +198,8 @@ public class BlogService {
 
 
         Flag flags = Flag.builder()
-                .Uid(user)
-                .Bid(blog)
+                .uid(user)
+                .bid(blog)
                 .build();
 
         flagRepository.save(flags);
@@ -210,33 +210,67 @@ public class BlogService {
 
     }
 
-//    public List<BlogSearchResponse> SearchBlog(int userId, BlogSearchRequest blogSearchRequest) {
-//        Optional<User> optionalUser = userRepository.findById(userId);
-//        if (optionalUser.isEmpty()) {
-//            return "Unable to Search: User not found with ID: " + userId;
-//        }
-//        User user = optionalUser.get();
-//
-//        List<Blog> blogs = new ArrayList<>();
-//
-//        // Retrieve the Blog entries for the given user ID
-//        List<Blog> blogEntries = blogRepository.findById();
-//
-//        // Check if wishlist entries are found for the user
-//        if (!blogEntries.isEmpty()) {
-//            // Iterate through each wishlist entry
-//            for (Blog blogEntry : blogEntries) {
-//                // Get the blog from the blogEntries
-//                Blog blogs = blogEntry.getMovieID();
-//                blogs.add(blog);
-//            }
-//        } else {
-//            // Log a message if wishlist entries are not found for the user
-//            System.out.println("No wishlist entries found for user ID: " + userId);
-//        }
-//
-//            return blogs;
-//        }
+
+    public int getLikesCountForBlog(int userId, Integer bid) {
+        // Check if the blog exists
+        Optional<Blog> optionalBlog = blogRepository.findById(bid);
+        if (optionalBlog.isEmpty()) {
+            throw new IllegalArgumentException("Blog does not exist with ID: " + bid);
+        }
+
+        // Get the count of likes for the blog
+        int likesCount = likeRepository.countByBid_Id(bid);
+        return likesCount;
+    }
+
+
+
+
+
+    public List<BlogSearchResponse> searchBlog(int userId, BlogSearchRequest blogSearchRequest) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new IllegalArgumentException("Invalid User " + userId);
+        }
+
+        List<BlogSearchResponse> blogs = new ArrayList<>();
+
+         //Retrieve the Blog entries for the given user ID and matching title pattern
+        String titlePattern = blogSearchRequest.getTitle().split(" ")[0]; // Assuming you want to match the first word of the title
+        List<Blog> blogEntries = blogRepository.findByTitleLike("%" + titlePattern + "%");
+
+        // Iterate through each matching blog entry
+        System.out.println("{}{{{}{{}{}{}{}{}{}{}{}hey");
+        for (Blog blogEntry : blogEntries) {
+            // Get the id of the current blogEntry
+            Integer bid = blogEntry.getId();
+            System.out.println(bid);
+            // Get the counts for likes, dislikes, and flags for the blog
+            int likesCount = likeRepository.countByBid_Id(bid);
+            System.out.println(likesCount);
+            int dislikesCount = dislikeRepository.countByBid_Id(bid);
+            System.out.println(dislikesCount);
+            int flagsCount = flagRepository.countByBid_Id(bid);
+            System.out.println(flagsCount);
+
+            // Construct a BlogSearchResponse object and add it to the list
+            BlogSearchResponse blogSearchResponse = new BlogSearchResponse();
+            blogSearchResponse.setBlogItem(blogEntry.getBlogItem());
+            blogSearchResponse.setTitle(blogEntry.getTitle());
+            blogSearchResponse.setAuthor(blogEntry.getAuthor());
+            blogSearchResponse.setLikes(likesCount);
+            blogSearchResponse.setDislikes(dislikesCount);
+            blogSearchResponse.setFlags(flagsCount);
+
+            blogs.add(blogSearchResponse);
+        }
+
+
+        return blogs;
+    }
+
+
+
 
 
 
