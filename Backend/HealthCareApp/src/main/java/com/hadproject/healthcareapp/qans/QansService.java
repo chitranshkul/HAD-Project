@@ -207,14 +207,15 @@ public class QansService {
                             UserDetail userDetail = optionalUserDetail.get();
                             // Extract the username from the UserDetail entity
                             String username = userDetail.getFname();
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-                            LocalDateTime dateTime = LocalDateTime.parse(ques.getDate(), formatter);
+                            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+                            //LocalDateTime dateTime = LocalDateTime.parse(ques.getDate(), formatter);
                             // Create the AnswerResponse object
                             AnswerResponse response = AnswerResponse.builder()
                                     .id(answer.getId())
                                     .name(username)
                                     .answers_text(answer.getAnswers_text())
-                                    .date(dateTime.toLocalDate()+"")
+//                                    .date(new date())
+                                    .date(String.valueOf(LocalDateTime.now()))
                                     .flag(answer.getFlag())
                                     .upvotes(answer.getUpvotes())
                                     .build();
