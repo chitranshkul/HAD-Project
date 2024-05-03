@@ -1,13 +1,9 @@
 package com.hadproject.healthcareapp;
 
-import com.hadproject.healthcareapp.Courses.Courses;
-import com.hadproject.healthcareapp.Courses.CoursesRepositry;
+
 import com.hadproject.healthcareapp.auth.AuthenticationService;
 import com.hadproject.healthcareapp.auth.RegisterRequest;
-import com.hadproject.healthcareapp.department.Department;
-import com.hadproject.healthcareapp.department.DepartmentRepository;
-import com.hadproject.healthcareapp.employee.Employee;
-import com.hadproject.healthcareapp.employee.EmployeeRepository;
+
 import com.hadproject.healthcareapp.user.Role;
 import com.hadproject.healthcareapp.user.User;
 import com.hadproject.healthcareapp.user.UserRepository;
@@ -31,10 +27,8 @@ public class HealthCareApp {
 	@Bean
 	public CommandLineRunner commandLineRunner(
 			UserRepository userRepository,
-			DepartmentRepository departmentRepository,
 
-			EmployeeRepository employeeRepository,
-			CoursesRepositry coursesRepositry,
+
 			AuthenticationService authService
 	) {
 
@@ -43,11 +37,7 @@ public class HealthCareApp {
 			try {
 
 				//Create departments
-				Department department1 = Department.builder().name("CSE").capacity(50).build();
-				Department department2 = Department.builder().name("ESE").capacity(30).build();
 
-				departmentRepository.save(department1);
-				departmentRepository.save(department2);
 
 				// Create users
 

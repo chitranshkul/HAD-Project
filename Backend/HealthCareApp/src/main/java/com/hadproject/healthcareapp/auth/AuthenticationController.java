@@ -46,4 +46,10 @@ public class AuthenticationController {
   }
 
 
+  @GetMapping("/getProfileDetails/{username}")
+  public ResponseEntity<UserProfileResponse> getUserProfile(@PathVariable String username){
+    UserProfileResponse userProfile = service.getProfile(username);
+    return ResponseEntity.ok(userProfile);
+  }
+
 }

@@ -194,9 +194,10 @@ public class QansService {
             System.out.println("****************  Question id is  : " + questionId + " " + ques.getQuestionText());
             Optional<List<Answers>> optionalAnswers = Optional.ofNullable(answersRepository.findByQuestionid(ques));
             if (optionalAnswers.isPresent()) {
-                System.out.println("Heyyyyyyyyyyyyyyyyyyyy I got Some Answers");
+
                 List<AnswerResponse> answerResponses = new ArrayList<>();
                 List<Answers> answers = optionalAnswers.get();
+
                 for (Answers answer : answers) {
                     if (answer.isStatus()) { // Check if status is true
                         // Retrieve the UserDetail entity corresponding to the answer's u_id

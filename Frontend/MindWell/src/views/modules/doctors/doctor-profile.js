@@ -1,12 +1,71 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import { Col, Row, Table } from "react-bootstrap";
-
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from "axios";
 // Images
 import user1 from "../../../assets/images/user/11.png";
 
 import { Link } from "react-router-dom";
 
 function DoctorProfile() {
+
+
+  // const { id } = useParams();
+  let { uid } = useParams();
+
+
+  const [profile, setProfile] = useState({
+    fname: "Chitransh",
+    mname: "",
+    lname: "k",
+    gender: "male",
+    hno: "8",
+    dob: "2024-04-09",
+    dor: "",
+    educationDetails: [
+      {
+        year: "88",
+        degree: "88",
+        institute: "",
+        result: "8",
+        summary: "I am good at everything"
+      }
+    ],
+    expertienceDetails: [
+      {
+        year: "9",
+        department: "9",
+        position: "9",
+        hospital: "9",
+        feedback: "9"
+      }
+    ],
+    state: "8",
+    country: "India",
+    city: "8",
+    district: "8",
+    mobile: "8",
+    pin_Code: 0,
+    street1: "8",
+    street2: "88"
+  })
+
+
+  useEffect(() => {
+    console.log("Fetching Profile");
+    console.log(uid);
+
+    axios.get('/api/v1/auth/getProfileDetails/' + uid)
+      .then(response => {
+        setProfile(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching questions:', error);
+      });
+      
+  }, [uid]);
+
+
   return (
     <Fragment>
       <Row>
@@ -27,13 +86,14 @@ function DoctorProfile() {
                 </div>
                 <div className="text-center mt-3 ps-3 pe-3">
                   <h4>
-                    <b>Bini Jets</b>
+                    <b>{profile.fname + " " + profile.mname + " " + profile.lname}</b>
                   </h4>
                   <p>Doctor</p>
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Delectus repudiandae eveniet harum.
-                  </p>
+                  {profile.educationDetails.length > 0 &&
+                    (<p className="mb-0">
+                      {profile.educationDetails[0].summary}
+                    </p>
+                    )}
                 </div>
               </div>
             </div>
@@ -49,39 +109,33 @@ function DoctorProfile() {
             <div className="iq-card-body">
               <div className="about-info m-0 p-0">
                 <Row>
-                <div className="col-4">DOB:</div>
-                  <div className="col-8">25-07-2000</div>
+                  <div className="col-4">DOB:</div>
+                  <div className="col-8">{profile.dob}</div>
                   <div className="col-4">Age:</div>
                   <div className="col-8">27</div>
                   <div className="col-4">Gender:</div>
-                  <div className="col-8">Male</div>
+                  <div className="col-8">{profile.gender}</div>
                   <div className="col-4">Specialization:</div>
                   <div className="col-8">Senior Docter</div>
-                  <div className="col-4">Email:</div>
-                  <div className="col-8">
-                    <Link to="mailto:biniJets24@demo.com">
-                      {" "}
-                      biniJets24@demo.com{" "}
-                    </Link>
-                  </div>
+
                   <div className="col-4">Phone:</div>
                   <div className="col-8">
-                    <Link to="tel:001-2351-25612">+91 897 919 7985</Link>
+                    <Link to="tel:001-2351-25612">+91 {profile.mobile}</Link>
                   </div>
                   <div className="col-4">Stree 1:</div>
-                  <div className="col-8">Z/3-12, ZSI Housing Complex</div>
+                  <div className="col-8">{profile.street1}</div>
                   <div className="col-4">Stree 2:</div>
-                  <div className="col-8">218 Kaulagarh Road</div>
+                  <div className="col-8">{profile.street2}</div>
                   <div className="col-4">PinCode:</div>
-                  <div className="col-8">248195</div>
+                  <div className="col-8">{profile.pin_Code}</div>
                   <div className="col-4">City:</div>
-                  <div className="col-8">Dehradun</div>
+                  <div className="col-8">{profile.city}</div>
                   <div className="col-4">District:</div>
-                  <div className="col-8">Dehradun</div>
+                  <div className="col-8">{profile.district}</div>
                   <div className="col-4">State:</div>
-                  <div className="col-8">Uttarakhand</div>
+                  <div className="col-8">{profile.state}</div>
                   <div className="col-4">Date of Registration:</div>
-                  <div className="col-8">20-03-2020</div>
+                  <div className="col-8">{profile.dor}</div>
                 </Row>
               </div>
             </div>
@@ -90,97 +144,86 @@ function DoctorProfile() {
         </Col>
         <Col>
           <Row>
-            <Col md="12">
-              <div className="iq-card">
-                <div className="iq-card-header d-flex justify-content-between">
-                  <div className="iq-header-title">
-                    <h4 className="card-title">Education</h4>
+
+            {profile.educationDetails.length > 0 && (
+              <Col md="12">
+                <div className="iq-card">
+                  <div className="iq-card-header d-flex justify-content-between">
+                    <div className="iq-header-title">
+                      <h4 className="card-title">Education</h4>
+                    </div>
+                  </div>
+                  <div className="iq-card-body">
+                    <div className="table-responsive">
+                      <Table className="mb-0" borderless>
+                        <thead>
+                          <tr>
+                            <th scope="col">Year</th>
+                            <th scope="col">Degree</th>
+                            <th scope="col">Institute</th>
+                            <th scope="col">Result</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+
+                          {
+                            profile.educationDetails.map((education, index) => (
+                              <tr>
+                                <td>{education.year}</td>
+                                <td>{education.degree}</td>
+                                <td>{education.institute}</td>
+                                <td>
+                                  <span className="badge badge-success">
+                                    {education.result}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </Table>
+                    </div>
                   </div>
                 </div>
-                <div className="iq-card-body">
-                  <div className="table-responsive">
-                    <Table className="mb-0" borderless>
-                      <thead>
-                        <tr>
-                          <th scope="col">Year</th>
-                          <th scope="col">Degree</th>
-                          <th scope="col">Institute</th>
-                          <th scope="col">Result</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>2010</td>
-                          <td>MBBS, M.D</td>
-                          <td>University of Wyoming</td>
-                          <td>
-                            <span className="badge badge-success">
-                              Distinction
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>2014</td>
-                          <td>M.D. of Medicine</td>
-                          <td>Netherland Medical College</td>
-                          <td>
-                            <span className="badge badge-success">
-                              Distinction
-                            </span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </Table>
+              </Col>)}
+
+            {profile.expertienceDetails.length > 0 && (
+              <Col md="12">
+                <div className="iq-card">
+                  <div className="iq-card-header d-flex justify-content-between">
+                    <div className="iq-header-title">
+                      <h4 className="card-title">Experience</h4>
+                    </div>
+                  </div>
+                  <div className="iq-card-body">
+                    <div className="table-responsive">
+                      <Table className="mb-0" borderless>
+                        <thead>
+                          <tr>
+                            <th scope="col">Year</th>
+                            <th scope="col">Department</th>
+                            <th scope="col">Position</th>
+                            <th scope="col">Hospital</th>
+                            <th scope="col">Feedback</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(profile.expertienceDetails.map((experience, index) => (
+                            <tr>
+                              <td>{experience.year}</td>
+                              <td>{experience.degree}</td>
+                              <td>{experience.position}</td>
+                              <td>{experience.hospital}</td>
+                              <td>
+                                <span className="badge badge-primary">{experience.feedback}</span>
+                              </td>
+                            </tr>
+                          )))}
+                        </tbody>
+                      </Table>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Col>
-            <Col md="12">
-              <div className="iq-card">
-                <div className="iq-card-header d-flex justify-content-between">
-                  <div className="iq-header-title">
-                    <h4 className="card-title">Experience</h4>
-                  </div>
-                </div>
-                <div className="iq-card-body">
-                  <div className="table-responsive">
-                    <Table className="mb-0" borderless>
-                      <thead>
-                        <tr>
-                          <th scope="col">Year</th>
-                          <th scope="col">Department</th>
-                          <th scope="col">Position</th>
-                          <th scope="col">Hospital</th>
-                          <th scope="col">Feedback</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>2014 - 2018</td>
-                          <td>MBBS, M.D</td>
-                          <td>Senior Docter</td>
-                          <td>Midtown Medical Clinic</td>
-                          <td>
-                            <span className="badge badge-primary">Good</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>2018 - 2020</td>
-                          <td>M.D. of Medicine</td>
-                          <td>Associate Prof.</td>
-                          <td>Netherland Medical College</td>
-                          <td>
-                            <span className="badge badge-success">
-                              excellence
-                            </span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </Table>
-                  </div>
-                </div>
-              </div>
-            </Col>
+              </Col>)}
           </Row>
         </Col>
       </Row>

@@ -1,8 +1,7 @@
 package com.hadproject.healthcareapp.admin;
 
-import com.hadproject.healthcareapp.Courses.Courses;
-import com.hadproject.healthcareapp.auth.AuthenticationService;
-import com.hadproject.healthcareapp.department.Department;
+
+
 import com.hadproject.healthcareapp.user.Role;
 import com.hadproject.healthcareapp.user.User;
 import com.hadproject.healthcareapp.user.UserDetail;
@@ -32,11 +31,9 @@ public class AdminController {
     }
     @GetMapping("/getlistbyrole/{role}")
     public ResponseEntity<List<RoleListResponse>> getUsersByRole(@PathVariable Role role) {
-        Optional<List<RoleListResponse>> userDetails = adminService.getUsersByRole(role);
+        List<RoleListResponse> userDetails = adminService.getUsersByRole(role);
 
-        return userDetails
-                .map(users -> ResponseEntity.ok().body(users))
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(userDetails);
     }
 //    @GetMapping("/getProfilebyrole/{role}")
 //    public ResponseEntity<List<RoleProfileResponse>> getProfileByRole(@PathVariable Role role) {
