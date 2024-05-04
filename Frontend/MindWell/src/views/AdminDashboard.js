@@ -49,53 +49,63 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         const accessToken = localStorage.getItem('access_token');
-        const headers = {
-            "Access-Control-Allow-Origin": "*",
-            // "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-        };
-        const url = '/admin/getlistbyrole/' + selectedOption.name;
-        console.log("Selected Option: ", selectedOption.name)
-        axiosInstance.get(url, { headers: headers }).then((response) => {
-            console.log("I had Changed the URL");
-            setRoleList(response.data);
-        });
+        const role = localStorage.getItem('role');
+        if (role !== "ADMIN" || !accessToken)
+            navigate('/sign-in');
+        else {
+            const headers = {
+                "Access-Control-Allow-Origin": "*",
+                // "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+            };
+            const url = '/admin/getlistbyrole/' + selectedOption.name;
+            console.log("Selected Option: ", selectedOption.name)
+            axiosInstance.get(url, { headers: headers }).then((response) => {
+                console.log("I had Changed the URL");
+                setRoleList(response.data);
+            });
+        }
     }, [selectedOption]);
 
 
     useEffect(() => {
         const accessToken = localStorage.getItem('access_token');
-        const headers = {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            Authorization: `Bearer ${accessToken}`,
-        };
+        const role = localStorage.getItem('role');
+        if (role !== "ADMIN" && !accessToken)
+            navigate('/sign-in');
+        else {
+            const headers = {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                Authorization: `Bearer ${accessToken}`,
+            };
 
-        axios.get('/api/v1/admin/getcount/ADMIN', { headers: headers })
-            .then(response => {
-                console.log("Admins: ", response.data);
-                setToalAdmin(response.data);
-            })
+            axios.get('/api/v1/admin/getcount/ADMIN', { headers: headers })
+                .then(response => {
+                    console.log("Admins: ", response.data);
+                    setToalAdmin(response.data);
+                })
             axios.get('/api/v1/admin/getcount/MODERATOR', { headers: headers })
-            .then(response => {
-                console.log("Admins: ", response.data);
-                setTotalModerators(response.data);
-            })
+                .then(response => {
+                    console.log("Admins: ", response.data);
+                    setTotalModerators(response.data);
+                })
             axios.get('/api/v1/admin/getcount/PATIENT', { headers: headers })
-            .then(response => {
-                console.log("Admins: ", response.data);
-                setTotalPatients(response.data);
-            })
+                .then(response => {
+                    console.log("Admins: ", response.data);
+                    setTotalPatients(response.data);
+                })
             axios.get('/api/v1/admin/getcount/EXPERT', { headers: headers })
-            .then(response => {
-                console.log("Admins: ", response.data);
-                setTotalExperts(response.data);
-            })
+                .then(response => {
+                    console.log("Admins: ", response.data);
+                    setTotalExperts(response.data);
+                })
             axios.get('/api/v1/admin/getcount/SENIOR_DOCTOR', { headers: headers })
-            .then(response => {
-                console.log("Admins: ", response.data);
-                setTotalDoctors(response.data);
-            })
+                .then(response => {
+                    console.log("Admins: ", response.data);
+                    setTotalDoctors(response.data);
+                })
+        }
 
 
     }, [])

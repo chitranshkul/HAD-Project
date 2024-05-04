@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChattingResponse {
     @JsonProperty("senderid")
-    private Integer senderId;
+    private String senderId;
 
     @JsonProperty("receiverid")
-    private Integer receiverId;
+    private String receiverId;
 
     @JsonProperty("message")
     private String message;

@@ -11,7 +11,6 @@ import DashboardTwo from "../views/dashboard-2";
 import DashboardThree from "../views/dashboard-3";
 import DashboardFour from "../views/dashboard-4";
 import { AppRouter } from './app-router';
-import AllDoctors from "../views/modules/doctors/all-doctor";
 import AddDoctors from "../views/modules/doctors/add-doctors";
 import DoctorProfile from "../views/modules/doctors/doctor-profile";
 import EditDoctors from "../views/modules/doctors/edit-doctors";
@@ -145,11 +144,11 @@ export const IndexRouters = [
             },
             {
                 path:'all-doctors',
-                element:<AllDoctors/>
+                element:<DoctorsList/>
             },
             {
                 path:'add-doctors',
-                element:<DoctorsList/>
+                element:<AddDoctors/>
             },
             {
                 path:'doctors-profile/:uid',

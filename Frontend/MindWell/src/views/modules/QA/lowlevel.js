@@ -28,6 +28,7 @@ const LowLevel = () => {
       answers_text: ""
     }
   );
+  const [role,setRole] = useState(localStorage.getItem("role"));
 
   const [answers, setAnswers] = useState([{
     answer_id: 0,
@@ -266,6 +267,7 @@ const LowLevel = () => {
         </div>
       </div>
       <br></br>
+      { ((role === "EXPERT" || role=="PATIENT") && (
       <Row className="justify-content-end mb-3">
         <Form className="d-flex" onSubmit={handleAddQuestionSubmit}>
           <FormControl
@@ -280,7 +282,8 @@ const LowLevel = () => {
           </Button>
         </Form>
       </Row>
-
+      ))}
+    
       {/* Answers Section */}
       <div className="mb-3">
         <h4 className="mb-2">Answers:</h4>

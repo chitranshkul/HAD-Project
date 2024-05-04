@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { Col, Row, Button } from "react-bootstrap";
+import { Col, Row, Button, Alert } from "react-bootstrap";
 import axios from "axios";
 
 // Images
@@ -22,7 +22,7 @@ const DoctorsList = () => {
       name: "",
       gender: "",
       contact_no: "",
-      uid:"",
+      uid: "",
     }
   ]);
   useEffect(() => {
@@ -37,22 +37,23 @@ const DoctorsList = () => {
       });
 
   }, []);
+  const [show7, setShow7] = useState(false);
 
-  const formatDate = (date)=> {
+  const formatDate = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
-  const formatTime = (date)=> {
+  const formatTime = (date) => {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
     return `${hours}:${minutes}:${seconds}`;
   }
 
-  const handleSendAppointment = async(event) =>{
+  const handleSendAppointment = async (event) => {
     console.log(event.target.id);
     const userid = localStorage.getItem('id');
     console.log(userid);
@@ -66,8 +67,8 @@ const DoctorsList = () => {
 
       Time: formatTime(currentDateTime)
     }
-    
-    try{
+
+    try {
 
       const response = await axios({
         method: 'post',
@@ -75,8 +76,9 @@ const DoctorsList = () => {
         data: Appointment,
       });
       console.log(response);
+      setShow7(true);
 
-    }catch(excecption){
+    } catch (excecption) {
       console.log(excecption);
     }
   }
@@ -108,7 +110,7 @@ const DoctorsList = () => {
                 <div className="iq-doc-info mt-3">
                   <Link to="/home/doctors-profile"><h4> {expert.name}</h4></Link>
                   <p className="mb-0">{expert.gender}</p>
-                  <Link to={"/home/doctors-profile/"+expert.contact_no}>View Profile</Link>
+                  <Link to={"/home/doctors-profile/" + expert.contact_no}>View Profile</Link>
                 </div>
                 <div className="iq-doc-description mt-2">
                   {/* <p className="mb-0">
@@ -117,9 +119,11 @@ const DoctorsList = () => {
                   </p> */}
                 </div>
                 <br></br>
-                <Button to="#" id = {expert.uid} onClick = {handleSendAppointment} className="btn btn-primary">
+                <Button to="#" id={expert.uid} onClick={handleSendAppointment} className="btn btn-primary">
                   Send Appointment Request
                 </Button>
+                <br></br>
+
               </div>
             </div>
           </Col>
@@ -127,6 +131,31 @@ const DoctorsList = () => {
 
 
       </Row>
+      <Row>
+        <Col>
+        </Col>
+        <Col>
+          <Alert
+            show={show7}
+            className="alert text-white alert-dismissible bg-primary"
+            role="alert"
+            onClick={() => setShow7(false)}
+            dismissible
+          >
+            <div className="iq-alert-icon">
+              <i className="ri-alert-fill"></i>
+            </div>
+            <div className="iq-alert-text">
+              Appointent Request Send Successfully
+            </div>
+          </Alert>
+        </Col>
+        <Col>
+        </Col>
+        <Col>
+        </Col>
+      </Row>
+
     </Fragment>
   );
 };

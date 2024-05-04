@@ -1,6 +1,7 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 
 const PatientDashboard = () => {
+    useEffect(() => {}, []);
     return (
         <Fragment>
             {/* <Row> */}

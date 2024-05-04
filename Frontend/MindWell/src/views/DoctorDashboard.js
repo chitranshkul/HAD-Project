@@ -8,6 +8,7 @@ import axiosInstance from "../axiosInstance";
 const DoctorDashboard = () => {
     return (
         <Fragment>
+            
             <h1>Doctor Dashboard</h1>
         </Fragment>
     );

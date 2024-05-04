@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChattingRequest {
-    private int from_id;
-    private int to_id;
+    private String from_id;
+    private String to_id;
     private String message;
 }

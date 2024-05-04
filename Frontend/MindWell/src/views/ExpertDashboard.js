@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // Chart
 import Chart from "react-apexcharts";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 // Img
 import user from "../assets/images/user/04.jpg"
@@ -158,79 +159,87 @@ const ExpertDashboard = () => {
         }
     ]);
 
+    const navigate = useNavigate();
     useEffect(() => {
-        console.log("Fetching Appointments");
-        axios.get('/api/v1/appointment/RoleBasedAppointment/' + localStorage.getItem('id'))
-            .then(response => {
-                console.log(response.data)
-                setAppointments(response.data);
-            })
-            .catch(error => {
-                console.error('Error fetching questions:', error);
-            });
+        const accessToken = localStorage.getItem('access_token');
+        const role = localStorage.getItem('role');
+        console.log("Role: ", role, "Access Token: ", accessToken)
+        if (role !== "EXPERT" || !accessToken)
+            navigate('/sign-in');
+        else {
+            console.log("Fetching Appointments");
+            axios.get('/api/v1/appointment/RoleBasedAppointment/' + localStorage.getItem('id'))
+                .then(response => {
+                    console.log(response.data)
+                    setAppointments(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching questions:', error);
+                });
 
-        console.log("Gender Distribution");
-        axios.get('/api/v1/appointment/genderDistributionByExpert/' + localStorage.getItem('id'))
-            .then(response => {
-                console.log(response.data)
-                const updatedChartData = {
-                    ...chart6,
-                    series: [
-                      {
-                        ...chart6.series[0],
-                        data: response.data, // Update data with API response
-                      },
-                    ],
-                  };
-                  setChart6(updatedChartData);
-            })
-            .catch(error => {
-                console.error('Error fetching questions:', error);
-            });
+            console.log("Gender Distribution");
+            axios.get('/api/v1/appointment/genderDistributionByExpert/' + localStorage.getItem('id'))
+                .then(response => {
+                    console.log(response.data)
+                    const updatedChartData = {
+                        ...chart6,
+                        series: [
+                            {
+                                ...chart6.series[0],
+                                data: response.data, // Update data with API response
+                            },
+                        ],
+                    };
+                    setChart6(updatedChartData);
+                })
+                .catch(error => {
+                    console.error('Error fetching questions:', error);
+                });
 
             console.log("Appointent Count");
-        axios.get('/api/v1/appointment/appointmentCountByExpert/4')
-            .then(response => {
-                console.log(response.data)
-                setChart3(prevState => ({
-                    ...prevState,
-                    series: [{
-                        ...prevState.series[0], // Keep other properties of series intact
-                        data: response.data, // Update data with new data array from API
-                    }],
-                }));
-            })
-            .catch(error => {
-                console.error('Error fetching questions:', error);
-            });
+            axios.get('/api/v1/appointment/appointmentCountByExpert/4')
+                .then(response => {
+                    console.log(response.data)
+                    setChart3(prevState => ({
+                        ...prevState,
+                        series: [{
+                            ...prevState.series[0], // Keep other properties of series intact
+                            data: response.data, // Update data with new data array from API
+                        }],
+                    }));
+                })
+                .catch(error => {
+                    console.error('Error fetching questions:', error);
+                });
 
-        axios.get('/api/v1/appointment/getPendingAppointmets/' + localStorage.getItem('id'))
-            .then(response => {
-                console.log("Got Pending Appointments",response.data)
-                setPendingAppointments(response.data);
-            }).catch(error => {
-                console.error('Error fetching questions:', error);
-            });
+            axios.get('/api/v1/appointment/getPendingAppointmets/' + localStorage.getItem('id'))
+                .then(response => {
+                    console.log("Got Pending Appointments", response.data)
+                    setPendingAppointments(response.data);
+                }).catch(error => {
+                    console.error('Error fetching questions:', error);
+                });
+        }
 
     }, []);
 
-    const handleAcceptAppointment = async(event,appointment) =>{
+    const handleAcceptAppointment = async (event, appointment) => {
         event.preventDefault();
-        console.log("Accepting Appointment",appointment);
+        console.log("Accepting Appointment", appointment);
         const response = await axios({
             method: 'post',
-            url: `/api/v1/appointment/AcceptOrReject-request/`+appointment.appointid+`/Accept`,
-          });
+            url: `/api/v1/appointment/AcceptOrReject-request/` + appointment.appointid + `/Accept`,
+        });
         console.log(response.data);
     }
 
-    const handleRejectAppointment = async(event,appointment) =>{
+    const handleRejectAppointment = async (event, appointment) => {
         event.preventDefault();
-        console.log("Rejecting Appointment",appointment);
+        console.log("Rejecting Appointment", appointment);
         const response = await axios({
             method: 'post',
-            url: `/api/v1/appointment/AcceptOrReject-request/`+appointment.appointid+`/Reject`,
-          });
+            url: `/api/v1/appointment/AcceptOrReject-request/` + appointment.appointid + `/Reject`,
+        });
         console.log(response.data);
     }
 
@@ -353,29 +362,29 @@ const ExpertDashboard = () => {
                                 <div className="iq-card-body">
                                     <ul className="iq-timeline">
                                         {Pendingappointments.map((appointment, index) => (
-                                        <li>
-                                            <div className="timeline-dots-fill"></div>
-                                            <h5 className="float-start mb-2 text-dark">
-                                                {appointment.Name}
-                                            </h5>
+                                            <li>
+                                                <div className="timeline-dots-fill"></div>
+                                                <h5 className="float-start mb-2 text-dark">
+                                                    {appointment.Name}
+                                                </h5>
 
 
-                                            <div className="d-inline-block w-100">
-                                                <p>
-                                                    Date : {appointment.Date+" "+appointment.Time}
-                                                    <br></br>
-                                                    Gender: {appointment.gender}
-                                                </p>
-                                            </div>
-                                            <div className="d-flex justify-content-between justify-content-end">
-                                                <Button variant="primary" className="me-1 mb-3 " onClick={(event) => handleAcceptAppointment(event, appointment)}>
-                                                    <i class="fa fa-check"></i>Accept
-                                                </Button>
-                                                <Button variant="danger" className="me-1 mb-3 " onClick={(event) => handleRejectAppointment(event, appointment)}>
-                                                    <i class="fa fa-trash" ></i>Reject
-                                                </Button>
-                                            </div>
-                                        </li>
+                                                <div className="d-inline-block w-100">
+                                                    <p>
+                                                        Date : {appointment.Date + " " + appointment.Time}
+                                                        <br></br>
+                                                        Gender: {appointment.gender}
+                                                    </p>
+                                                </div>
+                                                <div className="d-flex justify-content-between justify-content-end">
+                                                    <Button variant="primary" className="me-1 mb-3 " onClick={(event) => handleAcceptAppointment(event, appointment)}>
+                                                        <i class="fa fa-check"></i>Accept
+                                                    </Button>
+                                                    <Button variant="danger" className="me-1 mb-3 " onClick={(event) => handleRejectAppointment(event, appointment)}>
+                                                        <i class="fa fa-trash" ></i>Reject
+                                                    </Button>
+                                                </div>
+                                            </li>
                                         ))}
 
 

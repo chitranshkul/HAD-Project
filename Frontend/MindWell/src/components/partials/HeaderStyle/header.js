@@ -8,7 +8,6 @@ import { Navbar, Dropdown, Form } from "react-bootstrap";
 
 // components
 import CustomToggle from "../../dropdowns";
-import Fullscreen from "../../fullscreen";
 
 // img
 import flag1 from "../../../assets/images/small/flag-01.png";
@@ -28,11 +27,13 @@ import { useSelector, useDispatch } from "react-redux";
 import * as SettingSelector from "../../../store/setting/selectors";
 import * as SettingAction from "../../../store/setting/actions";
 
+import { useNavigate } from "react-router-dom";
+
 const Header = memo(() => {
   // Fixed Header
   const [isFixed, setIsFixed] = useState(false);
   const [userName, setUserName] = useState("");
-
+  const navigate = useNavigate();
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY >= 75) {
@@ -52,6 +53,11 @@ const Header = memo(() => {
       
     };
   }, []);
+
+  const logout = () => {
+    localStorage.clear();
+    navigate("/sign-in");
+  }
 
   const appName = useSelector(SettingSelector.app_name);
   const themeSchemeDirection = useSelector(
@@ -431,7 +437,7 @@ const Header = memo(() => {
                   />
                   <div className="caption">
                     <h6 className="mb-0 line-height">{userName}</h6>
-                    <span className="font-size-12">Logout</span>
+                    <span className="font-size-12" onClick={logout}>Logout</span>
                   </div>
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="iq-sub-dropdown iq-user-dropdown">

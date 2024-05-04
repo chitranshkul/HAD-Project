@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 import axiosInstance from "../axiosInstance";
 import axios from 'axios';
-
+import { useNavigate } from "react-router-dom";
 
 const ModeratorDashboard = () => {
 
@@ -18,44 +18,52 @@ const ModeratorDashboard = () => {
         id: 0,
         answers_text: ""
     }]);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchDashboardData = async () => {
-            const accessToken = localStorage.getItem('access_token');
-            try {
+        const accessToken = localStorage.getItem('access_token');
+        const role = localStorage.getItem('role');
+        if (role !== "MODERATOR" || !accessToken)
+            navigate('/sign-in');
+        else {
+            const fetchDashboardData = async () => {
+                const accessToken = localStorage.getItem('access_token');
+                try {
 
-                const headers = {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    Authorization: `Bearer ${accessToken}`,
-                };
+                    const headers = {
+                        "Content-Type": "application/json",
+                        "Access-Control-Allow-Origin": "*",
+                        Authorization: `Bearer ${accessToken}`,
+                    };
 
 
-                axios.get('/api/v1/qaresponse/flaggedallquestions', { headers: headers })
-                    .then(response => {
-                        console.log("Admins: ", response.data);
-                        setFlaggedQuestion(response.data);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching responses', error);
-                    });
+                    axios.get('/api/v1/qaresponse/flaggedallquestions', { headers: headers })
+                        .then(response => {
+                            console.log("Admins: ", response.data);
+                            setFlaggedQuestion(response.data);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching responses', error);
+                        });
 
-                axios.get('/api/v1/qaresponse/flaggedallresponse', { headers: headers })
-                    .then(response => {
-                        console.log("Admins: ", response.data);
-                        setFlaggedResponses(response.data);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching responses:', error);
-                    });
+                    axios.get('/api/v1/qaresponse/flaggedallresponse', { headers: headers })
+                        .then(response => {
+                            console.log("Admins: ", response.data);
+                            setFlaggedResponses(response.data);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching responses:', error);
+                        });
 
+                }
+                catch (error) {
+                    console.error('Error fetching data:', error);
+                }
             }
-            catch (error) {
-                console.error('Error fetching data:', error);
-            }
+
+
+            fetchDashboardData();
         }
-
-        fetchDashboardData();
     }, []);
 
 

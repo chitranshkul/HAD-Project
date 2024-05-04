@@ -149,21 +149,24 @@ public class AppointmentService {
             for (Appointment appointment : appointments) {
                 User user = new User(); // Assuming you have a constructor or builder for User
                 user.setId(appointment.getExpertId()); // Set the id of the User object
-                System.out.println("******************************* ");
+                System.out.println("*******************************");
+
                 System.out.println(appointment.getId()+"****");
                 Optional<UserDetail> userDetailOptional = userDetailsRepository.findByUid(user);
                 if (userDetailOptional.isPresent()) {
 
                     UserDetail userDetail = userDetailOptional.get();
-                    Optional<User> optUsr = userRepository.findById(patientId);
+                    Optional<User> optUsr = userRepository.findById(userDetail.getId());
+
                     if(optUsr.isPresent()) {
                         User usr = optUsr.get();
                         appointmentResponses.add(RoleBasedAppointmentResponse.builder()
-                                .Name(userDetail.getFname() + " " + userDetail.getLname())
+                                .Name(userDetail.getFname() + " " +userDetail.getLname())
                                 .Date(appointment.getDate())
                                 .Time(appointment.getTime())
                                 .username(usr.getUsername())
                                 .appointmentID(appointment.getId())
+                                .gender(userDetail.getGender())
                                 .build());
                     }
                 } else {

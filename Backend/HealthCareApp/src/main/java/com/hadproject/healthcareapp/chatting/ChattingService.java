@@ -19,9 +19,9 @@ public class ChattingService {
 
 
     public String SendChat(ChattingRequest request){
-        var sender = userRepository.findById(request.getFrom_id()).orElseThrow(() -> new RuntimeException("User not found"));
+        var sender = userRepository.findByEmail(request.getFrom_id()).orElseThrow(() -> new RuntimeException("User not found"));
         System.out.println("***********************");
-        var receiver = userRepository.findById(request.getTo_id()).orElseThrow(() -> new RuntimeException("User not found"));
+        var receiver = userRepository.findByEmail(request.getTo_id()).orElseThrow(() -> new RuntimeException("User not found"));
         System.out.println("***********************");
 
         var chat = Chatting.builder()
@@ -67,8 +67,8 @@ public class ChattingService {
                         String formattedDateTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss, EEE MMM dd yyyy"));
 
                         ChattingResponse chatResponse = ChattingResponse.builder()
-                                .senderId(message.getFromid().getId())
-                                .receiverId(message.getToid().getId())
+                                .senderId(message.getFromid().getUsername())
+                                .receiverId(message.getToid().getUsername())
                                 .message(message.getMessage())
                                 .date(formattedDateTime)
                                 .build();
@@ -86,8 +86,8 @@ public class ChattingService {
                         String formattedDateTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss, EEE MMM dd yyyy"));
 
                         ChattingResponse chatResponse = ChattingResponse.builder()
-                                .senderId(message.getFromid().getId())
-                                .receiverId(message.getToid().getId())
+                                .senderId(message.getFromid().getUsername())
+                                .receiverId(message.getToid().getUsername())
                                 .message(message.getMessage())
                                 .date(formattedDateTime)
                                 .build();
