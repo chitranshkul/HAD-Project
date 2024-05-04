@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Builder
@@ -43,8 +44,8 @@ public class AppointmentService {
         System.out.println("Patient ID: " + patientId);
         System.out.println("expert ID: " + expertId);
 
-        LocalDate date = appointmentRequest.getDate();
-        LocalTime time = appointmentRequest.getTime();
+        LocalDate date = LocalDate.now();
+        LocalTime time = LocalTime.now();
 
         // Create an appointment entity
         Appointment appointment = Appointment.builder()
@@ -62,16 +63,21 @@ public class AppointmentService {
 
     public String acceptAppointment(Integer id) {
         Optional<Appointment> appointmentOptional = appointmentRepository.findById(id);
-        if(appointmentOptional.isPresent()){
-            Appointment appointment = appointmentOptional.get();
-            appointment.setStatus(1);
-            appointmentRepository.save(appointment);
-            return "Appointment Accepted";
-        }
-        else {
+        if (appointmentOptional.isPresent()) {
+            LocalDate currentDate = LocalDate.now();
+            if (ChronoUnit.DAYS.between(appointmentOptional.get().getDate(), currentDate) < 2) {
+                Appointment appointment = appointmentOptional.get();
+                appointment.setStatus(1);
+                appointmentRepository.save(appointment);
+                return "Appointment Accepted";
+            } else {
+                return "Appointment time lapsed";
+            }
+        } else {
             return "Appointment not found";
         }
     }
+
 
     public String rejectAppointment(Integer id) {
         Optional<Appointment> appointmentOptional = appointmentRepository.findById(id);
@@ -86,12 +92,19 @@ public class AppointmentService {
 
     public Optional<List<Appointment>> getAppointmentsByDate(LocalDate date) {
         try {
-            return appointmentRepository.findByDate(date);
+            LocalDate currentDate = LocalDate.now();
+            if (ChronoUnit.DAYS.between(date, currentDate) < 2) {
+                return appointmentRepository.findByDate(date);
+            } else {
+                // Return an empty list if the difference is more than 2 days
+                return Optional.of(new ArrayList<>());
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             return Optional.empty();
         }
     }
+
 
     public Optional<List<RoleBasedAppointmentResponse>> viewAppointmentDetails(Integer expertId) {
         try {
@@ -101,30 +114,30 @@ public class AppointmentService {
             List<RoleBasedAppointmentResponse> appointmentResponses = new ArrayList<>();
 
             for (Appointment appointment : appointments) {
-                if(appointment.getStatus()==1) {
+                // Check if the appointment status is active (assuming 1 means active)
+                if (appointment.getStatus() == 1) {
                     User user = new User(); // Assuming you have a constructor or builder for User
                     user.setId(appointment.getPatientId()); // Set the id of the User object
 
-                    Optional<UserDetail> userDetailOptional = userDetailsRepository.findByUid(user);
-                    if (userDetailOptional.isPresent()) {
-
-                        Optional<User> Optusr = userRepository.findById(appointment.getPatientId());
-                        if (Optusr.isPresent()) {
-                            User usr = Optusr.get();
-                            System.out.println("******************************* ");
-                            System.out.println(usr.getUsername() + "****");
-                            UserDetail userDetail = userDetailOptional.get();
-                            appointmentResponses.add(RoleBasedAppointmentResponse.builder()
-                                    .Name(userDetail.getFname() + " " + userDetail.getLname())
-                                    .Date(appointment.getDate())
-                                    .Time(appointment.getTime())
-                                    .username(usr.getUsername())
-                                    .gender(userDetail.getGender())
-                                    .appointmentID(appointment.getId())
-                                    .build());
+                    LocalDate currentDate = LocalDate.now();
+                    // Check if the appointment date is within the next 2 days
+                    if (ChronoUnit.DAYS.between(appointment.getDate(), currentDate) < 2) {
+                        Optional<UserDetail> userDetailOptional = userDetailsRepository.findByUid(user);
+                        if (userDetailOptional.isPresent()) {
+                            Optional<User> Optusr = userRepository.findById(appointment.getPatientId());
+                            if (Optusr.isPresent()) {
+                                User usr = Optusr.get();
+                                UserDetail userDetail = userDetailOptional.get();
+                                appointmentResponses.add(RoleBasedAppointmentResponse.builder()
+                                        .Name(userDetail.getFname() + " " + userDetail.getLname())
+                                        .Date(appointment.getDate())
+                                        .Time(appointment.getTime())
+                                        .username(usr.getUsername())
+                                        .gender(userDetail.getGender())
+                                        .appointmentID(appointment.getId())
+                                        .build());
+                            }
                         }
-                    } else {
-                        System.err.println("UserDetail not found for PatientId: " + appointment.getPatientId());
                     }
                 }
             }
@@ -147,27 +160,31 @@ public class AppointmentService {
             List<RoleBasedAppointmentResponse> appointmentResponses = new ArrayList<>();
 
             for (Appointment appointment : appointments) {
-                User user = new User(); // Assuming you have a constructor or builder for User
-                user.setId(appointment.getExpertId()); // Set the id of the User object
-                System.out.println("******************************* ");
-                System.out.println(appointment.getId()+"****");
-                Optional<UserDetail> userDetailOptional = userDetailsRepository.findByUid(user);
-                if (userDetailOptional.isPresent()) {
+                // Check if the appointment status is active (assuming 1 means active)
+                if (appointment.getStatus() == 1) {
+                    User user = new User(); // Assuming you have a constructor or builder for User
+                    user.setId(appointment.getExpertId()); // Set the id of the User object
 
-                    UserDetail userDetail = userDetailOptional.get();
-                    Optional<User> optUsr = userRepository.findById(patientId);
-                    if(optUsr.isPresent()) {
-                        User usr = optUsr.get();
-                        appointmentResponses.add(RoleBasedAppointmentResponse.builder()
-                                .Name(userDetail.getFname() + " " + userDetail.getLname())
-                                .Date(appointment.getDate())
-                                .Time(appointment.getTime())
-                                .username(usr.getUsername())
-                                .appointmentID(appointment.getId())
-                                .build());
+                    LocalDate currentDate = LocalDate.now();
+                    // Check if the appointment date is within the next 2 days
+                    if (ChronoUnit.DAYS.between(appointment.getDate(), currentDate) < 2) {
+                        Optional<UserDetail> userDetailOptional = userDetailsRepository.findByUid(user);
+                        if (userDetailOptional.isPresent()) {
+                            Optional<User> Optusr = userRepository.findById(appointment.getExpertId());
+                            if (Optusr.isPresent()) {
+                                User usr = Optusr.get();
+                                UserDetail userDetail = userDetailOptional.get();
+                                appointmentResponses.add(RoleBasedAppointmentResponse.builder()
+                                        .Name(userDetail.getFname() + " " + userDetail.getLname())
+                                        .Date(appointment.getDate())
+                                        .Time(appointment.getTime())
+                                        .username(usr.getUsername())
+                                        .gender(userDetail.getGender())
+                                        .appointmentID(appointment.getId())
+                                        .build());
+                            }
+                        }
                     }
-                } else {
-                    System.err.println("UserDetail not found for PatientId: " + appointment.getPatientId());
                 }
             }
 

@@ -28,6 +28,16 @@ application:
       refresh-token:
         expiration: 604800000 # 7 days
 
+cloud:
+  aws:
+    credentials:
+      access-key: AKIAW3MEFBHYBMEYF2NG
+      secret-key: 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
+    region:
+      static: eu-north-1
+    stack:
+      auto: false
+
 server:
   port: 8082
 

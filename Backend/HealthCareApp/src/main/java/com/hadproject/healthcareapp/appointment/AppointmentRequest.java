@@ -18,11 +18,11 @@ public class AppointmentRequest {
     @JsonProperty("Expert_ID")
     private int Expert_ID;
 
-    @JsonProperty("Date")
-    private LocalDate Date;
-
-    @JsonProperty("Time")
-    private LocalTime Time;
+//    @JsonProperty("Date")
+//    private LocalDate Date;
+//
+//    @JsonProperty("Time")
+//    private LocalTime Time;
 
 }
 
