@@ -36,7 +36,11 @@
 //
 //    @JsonIgnore
 //    @Column(nullable = false)
-//    private int mark;
+//    private String time;
+//
+//    @JsonIgnore
+//    @Column(nullable = false)
+//    private Integer mark;
 //
 //
 //}
