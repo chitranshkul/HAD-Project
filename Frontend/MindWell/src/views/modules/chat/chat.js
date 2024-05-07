@@ -60,7 +60,12 @@ const Chat = () => {
   const handleLoadChats = (event, appointment) => {
     event.preventDefault();
     setExpert(appointment.username)
-    axios.get('/api/v1/chatting/getChat/' + localStorage.getItem('username') + "/" + appointment.username)
+    const headers = {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+    };
+    axios.get('/api/v1/chatting/getChat/' + appointment.username,{headers: headers})
       .then(response => {
         console.log(response.data)
         setChats(response.data);
@@ -77,7 +82,12 @@ const Chat = () => {
     event.preventDefault();
     console.log("Sending Message: ", message);
 
-    console.log("Sending Message: ", message)
+    console.log("Sending Message: ", message);
+    const headers = {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+    };
     try {
       const response = await axios({
         method: 'post',
@@ -85,7 +95,7 @@ const Chat = () => {
         data: message,
       });
       console.log(response);
-      axios.get('/api/v1/chatting/getChat/' + localStorage.getItem('username') + "/" + message.to_id)
+      axios.get('/api/v1/chatting/getChat/' + message.to_id,{headers: headers})
       .then(response => {
         console.log(response.data)
         setChats(response.data);

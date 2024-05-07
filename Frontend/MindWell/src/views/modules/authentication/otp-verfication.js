@@ -3,16 +3,15 @@ import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import './otp-verification.css';
 
-import axiosInstance from '../../../axiosInstance';
-
+import axios from 'axios';
 
 const OTPVerification = () => {
-    
+
     const navigate = useNavigate();
 
     useEffect(() => {
-        const validateRequest =  () => {
-            if(localStorage.getItem('OTPStatus') == null){
+        const validateRequest = () => {
+            if (localStorage.getItem('OTPStatus') == null) {
                 navigate('/sign-in');
             }
 
@@ -20,14 +19,14 @@ const OTPVerification = () => {
         }
         validateRequest()
     }, [navigate]);
-    
+
 
     const [otpDetails, setotpDetails] = useState({
         email: localStorage.getItem('email'),
         otp: ""
     });
 
-    
+
     const [errors, setErrors] = useState({});
 
     const validateForm = (data) => {
@@ -66,18 +65,17 @@ const OTPVerification = () => {
                 Authorization: `Bearer ${accessToken}`,
             };
 
-        axiosInstance.post('/users/verifyuseraccount', otpDetails, { headers: headers })
-            .then((response) => { 
-                console.log(response.data); 
-                const otpStatus = localStorage.getItem('OTPStatus');
-                if(otpStatus == "reset"){
-                    navigate('/set-new-password');
-                }
-                else if(otpStatus == "register"){
-                    navigate('/sign-in');
-                }
-            })
-            .catch((error) => { console.log(error);});
+            try {
+                const response1 = await axios({
+                    method: 'post',
+                    url: `/api/v1/users/verifyuseraccount`,
+                    data: otpDetails,
+                });
+                console.log(response1);
+                navigate("/sign-in")
+            } catch (error) {
+                console.log("Error: ", error)
+            }
         }
         else {
             console.log("Validataion Failed")
@@ -110,7 +108,7 @@ const OTPVerification = () => {
                                                 value={otpDetails.otp}
                                                 onChange={handleChangeInLoginDetails}
                                                 placeholder="6 digit OTP"
-                                            isInvalid={!!errors.otp}
+                                                isInvalid={!!errors.otp}
                                             />
                                             <Form.Control.Feedback type="invalid">{errors.otp}</Form.Control.Feedback>
                                         </Form.Group>

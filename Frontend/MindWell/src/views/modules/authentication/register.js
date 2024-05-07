@@ -166,7 +166,7 @@ const Register = () => {
       console.log(token);
       localStorage.setItem('id', token.id);
       localStorage.setItem('access_token', token.access_token);
-      localStorage.setItem('username', userDetail.email);
+      localStorage.setItem('email', userDetail.email);
       localStorage.setItem('OTPStatus', 'register');
       setOTPDetials({
         ...otpDetails,

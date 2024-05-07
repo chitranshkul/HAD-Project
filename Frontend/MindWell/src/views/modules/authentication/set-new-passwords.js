@@ -10,22 +10,21 @@ import "swiper/css/pagination";
 
 import img from "../../../assets/images/login/4.png"
 import my_logo from "../../../assets/images/custome-logo.png";
-import axiosInstance from '../../../axiosInstance';
-
+import axios from "axios";
 const SetNewPassword = () => {
 
-  
+
   const navigate = useNavigate();
 
 
   useEffect(() => {
-    const validateRequest =  () => {
-        if(localStorage.getItem('OTPStatus') != "reset"){
-            navigate('/sign-in');
-        }
+    const validateRequest = () => {
+      if (localStorage.getItem('OTPStatus') != "reset") {
+        navigate('/sign-in');
+      }
     }
     validateRequest()
-}, [navigate]);
+  }, [navigate]);
 
   const [passwordDetails, setPasswordDetails] = useState({
     email: localStorage.getItem('email'),
@@ -64,12 +63,18 @@ const SetNewPassword = () => {
         "Access-Control-Allow-Origin": "*",
       };
 
-      axiosInstance.post('/auth/resetpassord', passwordDetails, { headers: headers })
-        .then((response) => {
-          console.log(response.data);
-          navigate('/home/home');
-        })
-        .catch((error) => { console.log(error); });
+      try {
+        const response1 = await axios({
+          method: 'post',
+          url: `/api/v1/auth/resetpassord`,
+          data: passwordDetails,
+        });
+        console.log(response1);
+        navigate("/sign-in")
+      } catch (error) {
+        console.log("Error: ", error)
+      }
+
     }
     else {
       console.log("Validataion Failed")

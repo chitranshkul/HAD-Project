@@ -10,11 +10,11 @@ import EditDoctors from "../views/modules/doctors/edit-doctors";
 import Chat from "../views/modules/chat/chat";
 import HighLevel from "../views/modules/QA/highlevel";
 import Lowlevel from "../views/modules/QA/lowlevel";
-import Blogs1 from "../views/modules/QA/blogs1";
-import Blogs2 from "../views/modules/QA/blogs2";
+// import Blogs1 from "../views/modules/QA/blogs1";
+// import Blogs2 from "../views/modules/QA/blogs2";
 import Addblogs from "../views/modules/QA/addblogs";
-
-
+import Blogs1 from "../views/modules/Blogs/blog1";
+import Blogs2 from "../views/modules/Blogs/blog2";
 
 
 
@@ -23,6 +23,9 @@ import ModeratorDashboard from "../views/ModeratorDashboard";
 import DoctorDashboard from "../views/DoctorDashboard";
 import PatientDashboard from "../views/PatienetDashboard";
 import DoctorsList from "../views/modules/doctors/doctors-list";
+import Blogs3 from "../views/modules/Blogs/blogs3";
+import Blogs4 from "../views/modules/Blogs/blog4";
+import BlogList from "../views/modules/Blogs/bloglist";
 export const IndexRouters = [
     {
         path: '',
@@ -87,19 +90,38 @@ export const IndexRouters = [
                 path:'answers/:qid',
                 element:<Lowlevel/>
             },
-            {
-                path:'blogs1',
-                element:<Blogs1/>
-            },
-            {
-                path:'blogs2',
-                element:<Blogs2/>
-            },
+            // {
+            //     path:'blogs1',
+            //     element:<Blogs1/>
+            // },
+            // {
+            //     path:'blogs2',
+            //     element:<Blogs2/>
+            // },
             {
                 path:'addblogs',
                 element:<Addblogs/>
             },
-
+            {
+                path:'Exercise And Mental Health: How Do They Relate?',
+                element:<Blogs1/>
+            },
+            {
+                path:'How does exercise improve and benefit mental health?',
+                element:<Blogs2/>
+            },
+            {
+                path:'What is the best physical activity for mental health?',
+                element:<Blogs3/>
+            },
+            {
+                path:'Going smokefree; why the new age of sale proposal for smoking is good news for mental health',
+                element:<Blogs4/>
+            },
+            {
+                path:'bloglist',
+                element:<BlogList/>
+            },
             ...AppRouter
         ],
     }

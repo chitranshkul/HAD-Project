@@ -21,16 +21,18 @@ public class SeniorDoctor {
     private int id;
 
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "id")
-    private User uid;
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "did")
+    private User did;
 
-    @Column(nullable = false)
-    private String higest_degree;
-    @Column(nullable = false)
-    private String Specialization;
-    @Column(nullable = false)
-    private String exprience;
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "eid")
+    private User eid;
+
+
+
+
 
 }
 
